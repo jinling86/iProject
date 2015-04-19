@@ -154,6 +154,7 @@
     <TextView
         style="@style/TextShowTitle"
         android:layout_marginTop="6dp"
+        android:id="@+id/show_text_taskHint"
         android:text="Tasks"/>
 
     <RelativeLayout

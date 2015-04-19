@@ -16,7 +16,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,6 +54,7 @@ public class ActivityEdit extends ActionBarActivity {
 
     private ListView mList_UpperPart;
     private ListView mList_LowerPart;
+    private ScrollView mView_Framework;
 
     private String mProjectID;
     private String mTmpID;
@@ -116,6 +119,7 @@ public class ActivityEdit extends ActionBarActivity {
     }
 
     private void populateFields() {
+        int prevScrollPosition = mView_Framework.getScrollY();
         String[] projectContent = new String[ProjectManager.POS_MAX];
         mProjectManager.getProjectByID(mTmpID, projectContent);
         mView_ProjectName.setText(projectContent[ProjectManager.POS_NAME]);
@@ -153,6 +157,7 @@ public class ActivityEdit extends ActionBarActivity {
             fillList(mList_LowerPart, mEditingTaskIndex + 1, taskNumber);
         }
 
+        mView_Framework.setScrollY(prevScrollPosition);
     }
 
     private void fillList(ListView listView, int taskStart, int taskEnd) {
@@ -252,6 +257,7 @@ public class ActivityEdit extends ActionBarActivity {
 
         mList_UpperPart = (ListView) findViewById(R.id.edit_list_upperList);
         mList_LowerPart = (ListView) findViewById(R.id.edit_list_lowerList);
+        mView_Framework = (ScrollView) findViewById(R.id.edit_scrollView);
 
         mView_ProjectStartTime.setOnClickListener(new TimeSetter(mView_ProjectStartTime));
         mView_ProjectDueTime.setOnClickListener(new TimeSetter(mView_ProjectDueTime));
@@ -347,11 +353,16 @@ public class ActivityEdit extends ActionBarActivity {
         });
     }
 
-    public void buttonEditTaskClick(View view) {
+    public void onButtonEditTaskClick(View view) {
         if(mEditingTaskIndex == DEFAULT_TASK_INDEX) {
             mEditingTaskIndex = mList_UpperPart.getPositionForView((View) view.getParent());
             mEditingTaskContents = mProjectManager.getTask(mTmpID, mEditingTaskIndex);
-            populateFields();
+            if(mEditingTaskContents[ProjectManager.POS_COMPLETION].length() == 0)
+                populateFields();
+            else {
+                mEditingTaskIndex = DEFAULT_TASK_INDEX;
+                Toast.makeText(this, "Task Has Completed!", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -498,7 +509,7 @@ public class ActivityEdit extends ActionBarActivity {
                         mView_TaskDueDate,
                         mView_TaskDueTime);
             }
-            newFragment.show(getSupportFragmentManager(), "Choose a time");
+            newFragment.show(getSupportFragmentManager(), "Choose A Time");
         }
     }
 
@@ -555,7 +566,7 @@ public class ActivityEdit extends ActionBarActivity {
                         mView_TaskDueDate,
                         mView_TaskDueTime);
             }
-            newFragment.show(getSupportFragmentManager(), "Choose a date");
+            newFragment.show(getSupportFragmentManager(), "Choose A Date");
         }
     }
 

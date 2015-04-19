@@ -1,7 +1,6 @@
 package ca.uottawa.ljin027.iproject;
 
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,14 +8,12 @@ import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -240,6 +237,14 @@ public class ActivityShow extends ActionBarActivity {
                 mCurrentCompletedTasks++;
         }
         mList.setAdapter(new AdapterShow(taskList, this));
+
+        TextView view_TaskHint = (TextView)findViewById(R.id.show_text_taskHint);
+        if(mCurrentTaskNumber == 0)
+            view_TaskHint.setText("No Tasks");
+        else if(mCurrentTaskNumber == 1)
+            view_TaskHint.setText("Task");
+        else
+            view_TaskHint.setText("Tasks");
 
         mBar_TimeProgress.setProgress(getProjectProgress());
         mBar_TaskProgress.setProgress(getTaskProgress());

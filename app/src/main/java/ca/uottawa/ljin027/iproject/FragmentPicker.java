@@ -78,7 +78,7 @@ public class FragmentPicker extends DialogFragment
         Date newDate = Project.getDate(newDateString + mOrgTimeString);
         if(newDate.before(mLowerBound) || newDate.after(mUpperBound)) {
             mEditText.setText(mOrgDateString);
-            Toast.makeText(getActivity(), "Date range error!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Date range error!", Toast.LENGTH_SHORT).show();
         }
         else {
             mEditText.setText(newDateString);
@@ -92,7 +92,7 @@ public class FragmentPicker extends DialogFragment
         Date newDate = Project.getDate(mOrgDateString + newTimeString);
         if(newDate.before(mLowerBound) || newDate.after(mUpperBound)) {
             mEditText.setText(mOrgTimeString);
-            Toast.makeText(getActivity(), "Time range error!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Time range error!", Toast.LENGTH_SHORT).show();
         }
         else {
             mEditText.setText(newTimeString);

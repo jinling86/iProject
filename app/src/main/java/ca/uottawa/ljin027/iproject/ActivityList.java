@@ -11,12 +11,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ActivityList extends ActionBarActivity {
 
@@ -24,6 +24,9 @@ public class ActivityList extends ActionBarActivity {
     private ListView mView_ProjectList = null;
     private TextView mView_ProjectHint = null;
     private boolean mInSwitching;
+    Timer mTimer = null;
+    AdapterList mListAdapter;
+    ArrayList<ListList> mListContent;
 
     private final String TAG = "<<<< Activity List >>>>";
 
@@ -38,9 +41,13 @@ public class ActivityList extends ActionBarActivity {
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);
         actionBar.setIcon(R.drawable.ic_icon);
 
+        if(mTimer == null) {
+            mTimer = new Timer();
+        }
+
         mProjectManager = new ProjectManager(this);
         linkViews();
-        fillList();
+        populateFields();
 
         Log.d(TAG, "Activity created");
     }
@@ -56,12 +63,17 @@ public class ActivityList extends ActionBarActivity {
         super.onStart();
         mInSwitching = false;
         startService(new Intent(this, ServiceMusic.class));
+        if(mTimer == null) {
+            mTimer = new Timer();
+        }
     }
 
     @Override
     public void onStop() {
         if(!mInSwitching)
             stopService(new Intent(this, ServiceMusic.class));
+        mTimer.cancel();
+        mTimer = null;
         super.onStop();
     }
 
@@ -76,30 +88,172 @@ public class ActivityList extends ActionBarActivity {
         super.onConfigurationChanged(newConfig);
     }
 
-    private void fillList() {
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
+    private void populateFields() {
         int projectNumber = mProjectManager.getProjectNumber();
         if(projectNumber != 0) {
             mView_ProjectHint.setVisibility(View.GONE);
             mView_ProjectList.setVisibility(View.VISIBLE);
-
-            String[] from = new String[]{"name"};
-            int[] to = new int[]{R.id.text_list_name};
-
-            List<HashMap<String, String>> nodeList = new ArrayList<HashMap<String, String>>();
-            for (int i = 0; i < projectNumber; i++) {
-                HashMap<String, String> map = new HashMap<String, String>();
-                String[] projectContent = new String[ProjectManager.POS_MAX];
-                mProjectManager.getProjectByIndex(i, projectContent);
-                map.put("name", projectContent[ProjectManager.POS_NAME]);
-                nodeList.add(map);
-            }
-
-            SimpleAdapter adapter = new SimpleAdapter(this, nodeList, R.layout.project_listitem, from, to);
-            mView_ProjectList.setAdapter(adapter);
+            fillList();
         } else {
             mView_ProjectList.setVisibility(View.GONE);
             mView_ProjectHint.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void fillList() {
+        mTimer.cancel();
+
+        int projectNumber = mProjectManager.getProjectNumber();
+        mListContent = new ArrayList<ListList>();
+        for(int i = 0; i < projectNumber; i++) {
+            String [] projectContent = new String[ProjectManager.POS_MAX];
+            mProjectManager.getProjectByIndex(i, projectContent);
+            String projectID = mProjectManager.getIdByIndex(i);
+
+            mListContent.add(new ListList(
+                    projectContent[ProjectManager.POS_NAME],
+                    getCourseDigest(projectContent),
+                    getTaskDigest(projectID),
+                    getTimeDigest(projectID, projectContent),
+                    projectContent[ProjectManager.POS_COMPLETION].length() != 0,
+                    projectContent[ProjectManager.POS_IMPORTANCE].length() != 0,
+                    getTaskProgress(projectID),
+                    getTimeProgress(projectContent)
+            ));
+        }
+        mListAdapter = new AdapterList(mListContent, this);
+        mView_ProjectList.setAdapter(mListAdapter);
+
+        mTimer = new Timer();
+        mTimer.scheduleAtFixedRate(new UpdateTimeTask(), 0, 1000);
+    }
+
+    private String getTaskDigest(String projectID) {
+        StringBuilder builder = new StringBuilder();
+        int taskNumber = mProjectManager.getTaskNumber(projectID);
+        if(taskNumber != 0) {
+            int taskCompletion = 0;
+            for(int i = 0; i < taskNumber; i++) {
+                String [] contents = mProjectManager.getTask(projectID, i);
+                if(contents[ProjectManager.POS_COMPLETION].length() != 0)
+                    taskCompletion++;
+            }
+            if(taskCompletion <= 1) {
+                builder.append(taskCompletion);
+                builder.append(" task has been completed, ");
+            }
+            else {
+                builder.append(taskCompletion);
+                builder.append(" tasks has been completed, ");
+            }
+
+            builder.append(taskNumber - taskCompletion);
+            builder.append(" left");
+        }
+        else {
+            builder.append("Project does not contain sub-tasks");
+        }
+        return builder.toString();
+    }
+
+    private String getTimeDigest(String projectID, String [] projectContents) {
+        if(projectContents[ProjectManager.POS_COMPLETION].length() != 0) {
+            StringBuilder builder = new StringBuilder();
+            builder.append("Project has been completed");
+            return builder.toString();
+        }
+        else {
+            StringBuilder builder = new StringBuilder();
+            long currentTime = System.currentTimeMillis();
+            Date dueDate = Project.getDate(projectContents[ProjectManager.POS_DUE_DATE]+projectContents[ProjectManager.POS_DUE_TIME]);
+            long dueTime = dueDate.getTime();
+            if(dueTime <= currentTime) {
+                builder.append("Time exceeded");
+            }
+            else {
+                long offset = (dueTime - currentTime) / 1000;
+                long offsetSecond = offset % 60;
+                long offsetMinute = (offset / 60) % 60;
+                long offsetHour = (offset / (60*60)) % 24;
+                long offsetDay = offset / (60*60*24);
+                if(offsetDay <= 1) {
+                    builder.append(offsetDay);
+                    builder.append(" day, ");
+                }
+                else {
+                    builder.append(offsetDay);
+                    builder.append(" days, ");
+                }
+                if(offsetHour <= 1) {
+                    builder.append(offsetHour);
+                    builder.append(" hour, ");
+                }
+                else {
+                    builder.append(offsetHour);
+                    builder.append(" hours, ");
+                }
+                if(offsetMinute <= 1) {
+                    builder.append(offsetMinute);
+                    builder.append(" minute,  left");
+                }
+                else {
+                    builder.append(offsetMinute);
+                    builder.append(" minutes,  left");
+                }
+                if(offsetSecond <= 1) {
+                    builder.append(offsetSecond);
+                    builder.append(" second, left");
+                }
+                else {
+                    builder.append(offsetSecond);
+                    builder.append(" seconds left");
+                }
+
+            }
+
+            return builder.toString();
+        }
+    }
+
+    private String getCourseDigest(String [] projectContents) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(projectContents[ProjectManager.POS_COURSE_NAME]);
+        builder.append(", instructed by ");
+        builder.append(projectContents[ProjectManager.POS_INSTRUCTOR]);
+        return builder.toString();
+    }
+
+    private int getTimeProgress(String [] projectContents) {
+        long currentTime = System.currentTimeMillis();
+        Date startDate = Project.getDate(projectContents[ProjectManager.POS_START_DATE]+projectContents[ProjectManager.POS_START_TIME]);
+        Date dueDate = Project.getDate(projectContents[ProjectManager.POS_DUE_DATE]+projectContents[ProjectManager.POS_DUE_TIME]);
+        long startTime = startDate.getTime();
+        long dueTime = dueDate.getTime();
+        if(dueTime > currentTime && startTime < currentTime)
+            return (int)(100 * (currentTime - startTime) / (dueTime - startTime));
+        else if(currentTime > dueTime)
+            return 100;
+        else
+            return 0;
+    }
+
+    private int getTaskProgress(String projectID) {
+        int taskNumber = mProjectManager.getTaskNumber(projectID);
+        int taskCompletion = 0;
+        for(int i = 0; i < taskNumber; i++) {
+            String [] contents = mProjectManager.getTask(projectID, i);
+            if(contents[ProjectManager.POS_COMPLETION].length() != 0)
+                taskCompletion++;
+        }
+        if(taskNumber == 0)
+            return 100;
+        else
+            return 100*taskCompletion/taskNumber;
     }
 
     @Override
@@ -131,4 +285,30 @@ public class ActivityList extends ActionBarActivity {
             startActivity(intent);
         }
     }
+
+    class UpdateTimeTask extends TimerTask {
+        public void run() {
+            runOnUiThread(InternalTimeTask);
+        }
+    }
+
+    private Runnable InternalTimeTask = new Runnable() {
+        public void run() {
+            int projectNumber = mProjectManager.getProjectNumber();
+            if(mListContent == null || mListAdapter == null)
+                return;
+            if(mListContent.size() != projectNumber) {
+                Log.d(TAG, "Timer state error!");
+                return;
+            }
+            for(int i = 0; i < projectNumber; i++) {
+                String [] projectContent = new String[ProjectManager.POS_MAX];
+                mProjectManager.getProjectByIndex(i, projectContent);
+                String projectID = mProjectManager.getIdByIndex(i);
+                mListContent.get(i).setTimeDigest(getTimeDigest(projectID, projectContent));
+            }
+            mListAdapter.notifyDataSetChanged();
+            Log.d(TAG, "Time updated!");
+        }
+    };
 }

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
+        android:layout_marginTop="6dp"
+        android:background="@color/show_view_background">
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:id="@+id/list_image_importance"
+            android:layout_centerInParent="true"
+            android:layout_alignParentLeft="true"/>
+        <TextView
+            style="@style/TextShowContent"
+            android:layout_margin="0dp"
+            android:textSize="16sp"
+            android:height="24dp"
+            android:gravity="center"
+            android:id="@+id/list_text_name"
+            android:layout_centerInParent="true"/>
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:id="@+id/list_image_completion"
+            android:layout_centerInParent="true"
+            android:layout_alignParentRight="true" />
+
+    </RelativeLayout>
+
+    <LinearLayout style="@style/VerticalLinearLayout"
+        android:layout_marginRight="6dp"
+        android:layout_marginLeft="6dp"
+        android:background="@color/show_view_background" >
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:progressDrawable="@drawable/progress_bar_time"
+            android:max="100"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:id="@+id/list_progress_time"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp" />
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:progressDrawable="@drawable/progress_bar_time"
+            android:max="100"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:id="@+id/list_progress_task"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/VerticalLinearLayout"
+        android:layout_marginRight="6dp"
+        android:layout_marginLeft="6dp"
+        android:layout_marginBottom="5dp"
+        android:background="@color/show_view_background" >
+        <LinearLayout style="@style/HorizontalLinearLayout" >
+            <TextView
+                android:layout_marginTop="2dp"
+                android:layout_marginLeft="0dp"
+                style="@style/TextShowTitle"
+                android:text="Course info." />
+            <TextView
+                style="@style/TextShowContent"
+                android:layout_marginBottom="1dp"
+                android:layout_marginRight="0dp"
+                android:id="@+id/list_text_courseDigest" />
+        </LinearLayout>
+        <LinearLayout style="@style/HorizontalLinearLayout" >
+            <TextView
+                style="@style/TextShowTitle"
+                android:layout_marginLeft="0dp"
+                android:text="Tasks Digest" />
+            <TextView
+                style="@style/TextShowContent"
+                android:layout_marginBottom="1dp"
+                android:layout_marginRight="0dp"
+                android:id="@+id/list_text_taskDigest" />
+        </LinearLayout>
+        <LinearLayout style="@style/HorizontalLinearLayout" >
+            <TextView
+                style="@style/TextShowTitle"
+                android:layout_marginLeft="0dp"
+                android:text="Time left" />
+            <TextView
+                style="@style/TextShowContent"
+                android:layout_marginBottom="1dp"
+                android:layout_marginRight="0dp"
+                android:id="@+id/list_text_timeDigest" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

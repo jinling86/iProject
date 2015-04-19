@@ -86,7 +86,7 @@
         android:background="@drawable/ic_edit"
         android:layout_weight="1"
         android:clickable="true"
-        android:onClick="buttonEditTaskClick"
+        android:onClick="onButtonEditTaskClick"
         android:layout_gravity="center"/>
 
 </LinearLayout>
