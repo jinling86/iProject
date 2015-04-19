@@ -1,6 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">IProject</string>
+    <string name="app_name">iProject</string>
 
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="list_title">iProject</string>
+    <string name="list_no_items">No projects.</string>
+
+    <string name="show_title">Projects</string>
+
+    <string name="edit_title">Cancel</string>
 </resources>

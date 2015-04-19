@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+
+    <LinearLayout
+        style="@style/VerticalLinearLayout"
+        android:layout_weight="100">
+
+        <TextView
+            style="@style/TextShowContent"
+            android:textSize="14sp"
+            android:height="20dp"
+            android:layout_marginBottom="1dp"
+            android:gravity="center"
+            android:id="@+id/showList_text_taskName"
+            android:layout_marginTop="3dp"/>
+        <LinearLayout style="@style/HorizontalLinearLayout" >
+            <TextView
+                style="@style/TextShowTitle"
+                android:text="Members" />
+            <TextView
+                style="@style/TextShowContent"
+                android:layout_marginBottom="1dp"
+                android:id="@+id/showList_text_taskMembers" />
+        </LinearLayout>
+        <LinearLayout style="@style/HorizontalLinearLayout" >
+            <TextView
+                style="@style/TextShowTitle"
+                android:text="TODO" />
+            <TextView
+                style="@style/TextShowContent"
+                android:layout_marginBottom="1dp"
+                android:id="@+id/showList_text_taskDescription" />
+        </LinearLayout>
+        <LinearLayout style="@style/HorizontalLinearLayout" >
+            <TextView
+                style="@style/TextShowTitle"
+                android:text="From" />
+            <TextView
+                style="@style/TextShowContent"
+                android:layout_marginBottom="1dp"
+                android:id="@+id/showList_text_taskStartTime" />
+        </LinearLayout>
+        <LinearLayout style="@style/HorizontalLinearLayout" >
+            <TextView
+                style="@style/TextShowTitle"
+                android:text="To" />
+            <TextView
+                style="@style/TextShowContent"
+                android:layout_marginBottom="3dp"
+                android:id="@+id/showList_text_taskDueDate"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout style="@style/VerticalLinearLayout"
+        android:layout_gravity="center_vertical"
+        android:layout_width="wrap_content">
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:id="@+id/showList_check_complete"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:onClick="onCheckTaskComplete"/>
+        <TextView
+            style="@style/TextShowTitle"
+            android:textSize="8sp"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:gravity="center"
+            android:id="@+id/showList_text_completionHint" />
+    </LinearLayout>
+
+</LinearLayout>

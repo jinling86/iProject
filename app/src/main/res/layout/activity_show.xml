@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/image_bright"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp">
+
+    <TextView
+        style="@style/TextShowTitle"
+        android:text="Project" />
+
+    <LinearLayout style="@style/HorizontalLinearLayout" >
+        <TextView android:id="@+id/show_text_name"
+            style="@style/TextShowContent"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:textSize="24sp"
+            android:layout_weight="100"
+            android:gravity="center"/>
+        <ImageButton
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:id="@+id/show_button_importanceMarker"
+            android:layout_gravity="end"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/VerticalLinearLayout"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="3dp"
+        android:background="@color/show_view_background">
+        <LinearLayout style="@style/HorizontalLinearLayout" >
+            <TextView
+                style="@style/TextShowTitle"
+                android:text="Progress" />
+            <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
+                android:progressDrawable="@drawable/progress_bar_time"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:layout_marginRight="6dp"
+                android:layout_gravity="center"
+                android:max="100"
+                android:id="@+id/show_progress_timeProgress" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/HorizontalLinearLayout">
+            <TextView
+                style="@style/TextShowTitle"
+                android:text="Tasks" />
+            <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
+                android:progressDrawable="@drawable/progress_bar_time"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:layout_marginRight="6dp"
+                android:layout_gravity="center"
+                android:max="100"
+                android:id="@+id/show_progress_taskProgress" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/VerticalLinearLayout"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="3dp"
+        android:background="@color/show_view_background" >
+
+        <LinearLayout style="@style/HorizontalLinearLayout" >
+            <TextView
+                style="@style/TextShowTitle"
+                android:text="In course" />
+            <TextView
+                style="@style/TextShowContent"
+                android:id="@+id/show_text_courseName" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/HorizontalLinearLayout">
+            <TextView
+                style="@style/TextShowTitle"
+                android:text="Given by" />
+            <TextView
+                style="@style/TextShowContent"
+                android:id="@+id/show_text_instructor" />
+        </LinearLayout>
+        <LinearLayout
+            style="@style/HorizontalLinearLayout" >
+            <TextView
+                style="@style/TextShowTitle"
+                android:text="Starts from" />
+            <TextView
+                style="@style/TextShowContent"
+                android:id="@+id/show_text_projectStartTime" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/HorizontalLinearLayout">
+            <TextView
+                style="@style/TextShowTitle"
+                android:text="Due at" />
+            <TextView
+                style="@style/TextShowContent"
+                android:id="@+id/show_text_projectDueDate" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/VerticalLinearLayout"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="3dp"
+        android:background="@color/show_view_background" >
+
+        <TextView
+            style="@style/TextShowContent"
+            android:id="@+id/show_text_description"
+            android:layout_height="60dp"
+            android:scrollbars="vertical"
+            android:gravity="start|top"/>
+    </LinearLayout>
+
+    <TextView
+        style="@style/TextShowTitle"
+        android:layout_marginTop="6dp"
+        android:text="Tasks"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal">
+
+        <Button
+            style="@style/NarrowButton"
+            android:layout_width="match_parent"
+            android:layout_marginTop="6dp"
+            android:text="I Have Done It!"
+            android:textColor="@color/show_text_done"
+            android:id="@+id/show_button_done"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true" />
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/show_list_task"
+            android:background="@color/show_view_background"
+            android:layout_gravity="center_horizontal"
+            android:layout_above="@id/show_button_done"/>
+
+    </RelativeLayout>
+
+</LinearLayout>
