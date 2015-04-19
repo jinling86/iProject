@@ -2,11 +2,14 @@ package ca.uottawa.ljin027.iproject;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Surface;
@@ -51,6 +54,7 @@ public class ActivityShow extends ActionBarActivity {
 
     private ImageButton mButton_ImportanceMarker;
     private Button mButton_Done;
+    private Button mButton_Delete;
     private ListView mList;
 
     private static final String TAG = "<<<< Activity Show >>>>";
@@ -105,7 +109,24 @@ public class ActivityShow extends ActionBarActivity {
         populateFields();
         mInSwitching = false;
 
+        String state = Environment.getExternalStorageState();
+        Toast.makeText(this, "Sharing Needs Valid Mail Account!", Toast.LENGTH_LONG).show();
+
         Log.d(TAG, "Activity created.");
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        int rotation = getWindow().getWindowManager().getDefaultDisplay().getRotation();
+        if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
+            setContentView(R.layout.activity_show_landscape);
+        }
+        else {
+            setContentView(R.layout.activity_show);
+        }
+        linkViews();
+        populateFields();
     }
 
     private void linkViews() {
@@ -122,6 +143,7 @@ public class ActivityShow extends ActionBarActivity {
         mList = (ListView)findViewById(R.id.show_list_task);
         mButton_ImportanceMarker = (ImageButton)findViewById(R.id.show_button_importanceMarker);
         mButton_Done = (Button)findViewById(R.id.show_button_done);
+        mButton_Delete = (Button)findViewById(R.id.show_button_delete);
 
         mButton_ImportanceMarker.setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -164,6 +186,17 @@ public class ActivityShow extends ActionBarActivity {
                         mCurrentCompletion);
             }
         });
+
+        mButton_Delete.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "User clicked delete button.");
+                mProjectManager.deleteProject(mProjectID);
+                startActivity(new Intent(getApplicationContext(), ActivityList.class));
+                mInSwitching = true;
+                finish();
+            }
+        });
     }
 
     private void populateFields() {
@@ -180,8 +213,14 @@ public class ActivityShow extends ActionBarActivity {
             mButton_ImportanceMarker.setBackgroundResource(R.drawable.ic_important);
         else
             mButton_ImportanceMarker.setBackgroundResource(R.drawable.ic_unimportant);
-        if(mCurrentCompletion)
+        if(mCurrentCompletion) {
             mButton_Done.setVisibility(View.GONE);
+            mButton_Delete.setVisibility(View.VISIBLE);
+        }
+        else {
+            mButton_Done.setVisibility(View.VISIBLE);
+            mButton_Delete.setVisibility(View.GONE);
+        }
 
         mCurrentCompletedTasks = 0;
         mCurrentTaskNumber = mProjectManager.getTaskNumber(mProjectID);
@@ -211,6 +250,7 @@ public class ActivityShow extends ActionBarActivity {
     public void onBackPressed() {
         Log.d(TAG, "On pressed back button.");
         startActivity(getSupportParentActivityIntent());
+        finish();
     }
 
     @Override
@@ -219,6 +259,13 @@ public class ActivityShow extends ActionBarActivity {
         if(!mInSwitching)
             stopService(new Intent(this, ServiceMusic.class));
         super.onStop();
+    }
+
+    @Override
+    protected void onRestart() {
+        Log.d(TAG, "On restart.");
+        startService(new Intent(this, ServiceMusic.class));
+        super.onRestart();
     }
 
     @Override
@@ -247,7 +294,7 @@ public class ActivityShow extends ActionBarActivity {
         if (id == R.id.action_edit_project) {
             Log.d(TAG, "User clicked edit menu.");
             if(mCurrentCompletion) {
-                Toast.makeText(this, "Cannot Edit A Completed Project!", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Cannot Edit A Completed Project!", Toast.LENGTH_SHORT).show();
             }
             else {
                 mInSwitching = true;
@@ -259,22 +306,29 @@ public class ActivityShow extends ActionBarActivity {
         }
         if (id == R.id.action_share_project) {
             String fileName = mProjectManager.saveOneProject(mProjectID);
-            Log.d(TAG, fileName + " is created and being sent");
+            if(fileName.length() != 0) {
+                Log.d(TAG, fileName + " has been exported and is being sent!");
+                Toast.makeText(this, fileName + " has been exported", Toast.LENGTH_SHORT).show();
 
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.setType("text/plain");
-            intent.putExtra(Intent.EXTRA_EMAIL, new String[] {"example@example.com"});
-            intent.putExtra(Intent.EXTRA_SUBJECT, "Sharing an iProject");
-            intent.putExtra(Intent.EXTRA_TEXT, "This is my project " + mProjectContents[ProjectManager.POS_NAME]);
-            File file = new File(fileName);
-            if (!file.exists() || !file.canRead()) {
-                Toast.makeText(this, "Attachment Error!", Toast.LENGTH_SHORT).show();
-                return false;
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("message/rfc822");
+                intent.putExtra(Intent.EXTRA_EMAIL, new String[] {"ljin027@uottawa.ca"});
+                intent.putExtra(Intent.EXTRA_SUBJECT, "Sharing an iProject");
+                intent.putExtra(Intent.EXTRA_TEXT,
+                        "This is my project \""
+                        + mProjectContents[ProjectManager.POS_NAME]
+                        + "\":\n"
+                        + mProjectContents[ProjectManager.POS_DESCRIPTION]);
+
+                File file = new File(fileName);
+                if (!file.exists() || !file.canRead()) {
+                    Toast.makeText(this, "Attachment Error!", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                Uri uri = Uri.parse("file://" + file.getAbsolutePath());
+                intent.putExtra(Intent.EXTRA_STREAM, uri);
+                startActivity(Intent.createChooser(intent, "Send Email"));
             }
-            Uri uri = Uri.parse("file://" + file.getAbsolutePath());
-            //intent.putExtra(Intent.EXTRA_STREAM, uri);
-            startActivity(Intent.createChooser(intent, "Send Email"));
-
             return false;
         }
 

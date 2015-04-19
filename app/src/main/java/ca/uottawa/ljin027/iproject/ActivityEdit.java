@@ -1,5 +1,6 @@
 package ca.uottawa.ljin027.iproject;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -9,6 +10,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -54,7 +57,7 @@ public class ActivityEdit extends ActionBarActivity {
     private String mTmpID;
     private boolean mNewProject;
     private ProjectManager mProjectManager;
-    private boolean mRotating = false;
+    private boolean mInSwitching = false;
 
     private int mEditingTaskIndex = DEFAULT_TASK_INDEX;
     private String [] mEditingTaskContents;
@@ -79,13 +82,14 @@ public class ActivityEdit extends ActionBarActivity {
         mTmpID = null;
         mProjectID = "";
         if(savedInstanceState != null) {
-            startService(new Intent(this, ServiceMusic.class));
             mProjectID = (String) savedInstanceState.getSerializable(PROJECT_ID);
             mTmpID = (String) savedInstanceState.getSerializable(PROJECT_TMP_ID);
             mNewProject = (Boolean) savedInstanceState.getSerializable(PROJECT_INDICATOR);
             mEditingTaskIndex = (Integer) savedInstanceState.getSerializable(TASK_STATE);
             if(mEditingTaskIndex != DEFAULT_TASK_INDEX)
                 mEditingTaskContents = (String []) savedInstanceState.getSerializable(TASK_CONTENT);
+
+            startService(new Intent(this, ServiceMusic.class));
         }
         else {
             Bundle extras = getIntent().getExtras();
@@ -106,6 +110,7 @@ public class ActivityEdit extends ActionBarActivity {
         }
 
         populateFields();
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         Log.d(TAG, "Created successfully, ID = " + mTmpID + (mNewProject ? " (new)" : ""));
     }
@@ -268,6 +273,7 @@ public class ActivityEdit extends ActionBarActivity {
                     mProjectManager.addTask(mTmpID, startTime, dueDate);
                     mEditingTaskIndex = mProjectManager.getTaskNumber(mTmpID) - 1;
                     populateFields();
+                    closeKeyboard();
                 }
             }
         });
@@ -280,6 +286,7 @@ public class ActivityEdit extends ActionBarActivity {
                     mProjectManager.deleteTask(mTmpID, mEditingTaskIndex);
                     mEditingTaskIndex = DEFAULT_TASK_INDEX;
                     populateFields();
+                    closeKeyboard();
                 }
                 else {
                     Log.d(TAG, "Internal state error!");
@@ -296,6 +303,7 @@ public class ActivityEdit extends ActionBarActivity {
                     update();
                     mEditingTaskIndex = DEFAULT_TASK_INDEX;
                     populateFields();
+                    closeKeyboard();
                 }
                 else {
                     Log.d(TAG, "Internal state error!");
@@ -330,6 +338,7 @@ public class ActivityEdit extends ActionBarActivity {
             public void onClick(View v) {
                 mProjectManager.deleteProject(mTmpID);
                 mTmpID = null;
+                mInSwitching = true;
                 if(!mNewProject) {
                     mProjectManager.deleteProject(mProjectID);
                 }
@@ -351,7 +360,6 @@ public class ActivityEdit extends ActionBarActivity {
         super.onSaveInstanceState(outState);
         if(mTmpID != null) {
             update();
-            mRotating = true;
             outState.putSerializable(PROJECT_ID, mProjectID);
             outState.putSerializable(PROJECT_TMP_ID, mTmpID);
             outState.putSerializable(PROJECT_INDICATOR, mNewProject);
@@ -376,14 +384,18 @@ public class ActivityEdit extends ActionBarActivity {
                 Intent intent = new Intent(this, ActivityShow.class);
                 intent.putExtra(ProjectManager.PROJECT_ID, mTmpID);
                 mTmpID = null;
+                mInSwitching = true;
                 startActivity(intent);
+                finish();
             }
             else {
                 mProjectManager.destroyTmpProject(mTmpID, mProjectID);
                 mTmpID = null;
+                mInSwitching = true;
                 Intent intent = new Intent(this, ActivityShow.class);
                 intent.putExtra(ProjectManager.PROJECT_ID, mProjectID);
                 startActivity(intent);
+                finish();
             }
             return false;
         }
@@ -396,6 +408,7 @@ public class ActivityEdit extends ActionBarActivity {
         if(mNewProject) {
             mProjectManager.deleteProject(mTmpID);
             mTmpID = null;
+            mInSwitching = true;
             return new Intent(this, ActivityList.class);
         }
         else {
@@ -403,6 +416,7 @@ public class ActivityEdit extends ActionBarActivity {
             intent.putExtra(ProjectManager.PROJECT_ID, mProjectID);
             mProjectManager.deleteProject(mTmpID);
             mTmpID = null;
+            mInSwitching = true;
             return intent;
         }
     }
@@ -410,16 +424,23 @@ public class ActivityEdit extends ActionBarActivity {
     @Override
     public void onBackPressed() {
         startActivity(getSupportParentActivityIntent());
+        finish();
+    }
+
+    @Override
+    protected void onRestart() {
+        Log.d(TAG, "On restart.");
+        startService(new Intent(this, ServiceMusic.class));
+        super.onRestart();
     }
 
     @Override
     protected void onStop() {
-        if(!mRotating && mTmpID != null) {
+        if(mTmpID != null) {
             Log.d(TAG, "Activity switched out, discard changes");
             mProjectManager.deleteProject(mTmpID);
-            stopService(new Intent(this, ServiceMusic.class));
         }
-        if(mRotating)
+        if(!mInSwitching)
             stopService(new Intent(this, ServiceMusic.class));
         super.onStop();
     }
@@ -619,5 +640,13 @@ public class ActivityEdit extends ActionBarActivity {
         Date lowerBound = Project.getDate(
                 mView_TaskStartDate.getText().toString()+ mView_TaskStartTime.getText().toString());
         return lowerBound;
+    }
+
+    private void closeKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+        View view = getCurrentFocus();
+        if(view != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }

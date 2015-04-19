@@ -1,8 +1,11 @@
 package ca.uottawa.ljin027.iproject;
 
 import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -302,17 +305,27 @@ public class ProjectManager {
     }
 
     public String saveOneProject(String id) {
+        String state = Environment.getExternalStorageState();
+        if (!Environment.MEDIA_MOUNTED.equals(state)) {
+            Toast.makeText(mContext, "Cannot Access to External Storage!", Toast.LENGTH_SHORT).show();
+            return ERROR_MSG;
+        }
         Project project = findProject(id);
         if(project == null)
             return ERROR_MSG;
         try {
-            String fileName = FILE_NAME_PREFIX + project.getName().replaceAll("[^a-zA-Z0-9.-]", "_") + FILE_NAME_SUFFIX;
-            FileOutputStream fos = mContext.openFileOutput(fileName, Context.MODE_PRIVATE);
+            String fileName = mContext.getExternalFilesDir(null)
+                    + "/"
+                    + FILE_NAME_PREFIX
+                    + project.getName().replaceAll("[^a-zA-Z0-9.-]", "_")
+                    + FILE_NAME_SUFFIX;
+            File file = new File(fileName);
+            FileOutputStream fos = new FileOutputStream(file);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(project);
             oos.close();
             Log.d(TAG, "Project export successfully.");
-            return mContext.getFilesDir().getPath() + "/" + fileName;
+            return fileName;
         } catch( IOException e ) {
             e.printStackTrace();
             Log.d(TAG, "Project export unsuccessfully!");

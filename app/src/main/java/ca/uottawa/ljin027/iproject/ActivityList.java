@@ -1,6 +1,7 @@
 package ca.uottawa.ljin027.iproject;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -37,22 +38,24 @@ public class ActivityList extends ActionBarActivity {
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);
         actionBar.setIcon(R.drawable.ic_icon);
 
-        // Store the handle
+        mProjectManager = new ProjectManager(this);
+        linkViews();
+        fillList();
+
+        Log.d(TAG, "Activity created");
+    }
+
+    private void linkViews() {
         mView_ProjectList = (ListView)findViewById(R.id.list_project);
         mView_ProjectHint = (TextView)findViewById(R.id.text_hint);
         mView_ProjectList.setOnItemClickListener(new ItemClickListener());
-
-        Log.d(TAG, "Activity created");
-
-        mInSwitching = false;
-        startService(new Intent(this, ServiceMusic.class));
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        mProjectManager = new ProjectManager(this);
-        fillList();
+        mInSwitching = false;
+        startService(new Intent(this, ServiceMusic.class));
     }
 
     @Override
@@ -65,6 +68,12 @@ public class ActivityList extends ActionBarActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 
     private void fillList() {

@@ -26,6 +26,7 @@
             android:layout_height="32dp"
             android:id="@+id/show_button_importanceMarker"
             android:layout_gravity="end"
+            android:layout_marginRight="6dp"
             android:layout_weight="1" />
     </LinearLayout>
 
@@ -141,6 +142,18 @@
             android:id="@+id/show_button_done"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true" />
+
+        <Button
+            style="@style/NarrowButton"
+            android:layout_width="match_parent"
+            android:layout_marginTop="6dp"
+            android:text="DELETE PROJECT"
+            android:textColor="@color/edit_delete"
+            android:textStyle="bold"
+            android:id="@+id/show_button_delete"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:visibility="gone"/>
 
         <ListView
             android:layout_width="match_parent"
