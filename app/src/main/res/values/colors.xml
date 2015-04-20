@@ -7,4 +7,9 @@
     <item name="show_view_background" type="color">#50ffffff</item>
     <item name="show_text_done" type="color">#ff305dff</item>
     <item name="show_pure_transparent" type="color">#00000000</item>
+
+    <item name="dialog_background" type="color">#96000000</item>
+    <item name="dialog_warn_text" type="color">#ffff524a</item>
+    <item name="dialog_about_text" type="color">#ffffa806</item>
+    <item name="dialog_report_text" type="color">#ffffffff</item>
 </resources>

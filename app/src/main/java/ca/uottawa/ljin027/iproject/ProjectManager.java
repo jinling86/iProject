@@ -13,6 +13,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.PriorityQueue;
 import java.util.TreeMap;
 
 /**
@@ -41,6 +42,7 @@ public class ProjectManager {
     private final String FILE_NAME = "projects";
     private final String FILE_NAME_PREFIX = "iProject_";
     private final String FILE_NAME_SUFFIX = ".ipj";
+    private final int NAME_LENGTH = 30;
 
     private ArrayList<Project> mProjects;
     private TreeMap<Integer, Integer> mMap;
@@ -282,10 +284,39 @@ public class ProjectManager {
         saveProjects();
     }
 
-    void setDefaultMap() {
+    public void setDefaultMap() {
         mMap = new TreeMap<Integer, Integer>();
         for(int i = 0; i < mProjects.size(); i++) {
             mMap.put(i, i);
+        }
+    }
+
+    public void setPriorityMap() {
+        setDateDescendingMap();
+        TreeMap<Integer, Integer> sortedMap = mMap;
+        mMap = new TreeMap<Integer, Integer>();
+        int index = 0;
+        for(int i = 0; i < mProjects.size(); i++) {
+            if(mProjects.get(sortedMap.get(i)).getImportance() == Project.IMPORTANT) {
+                mMap.put(index, sortedMap.get(i));
+                index++;
+            }
+        }
+        for(int i = 0; i < mProjects.size(); i++) {
+            if(mProjects.get(sortedMap.get(i)).getImportance() != Project.IMPORTANT) {
+                mMap.put(index, sortedMap.get(i));
+                index++;
+            }
+        }
+    }
+
+    public void setDateDescendingMap() {
+        PriorityQueue<Project> sorted = new PriorityQueue<Project>(mProjects);
+        mMap = new TreeMap<Integer, Integer>();
+        int i = 0;
+        for(Project project = sorted.poll(); project != null; project = sorted.poll()) {
+            mMap.put(i, mProjects.indexOf(project));
+            i++;
         }
     }
 
@@ -396,5 +427,77 @@ public class ProjectManager {
             mProjects.remove(project);
             saveProjects();
         }
+    }
+
+    public String getOngoingReport() {
+        StringBuilder builder = new StringBuilder();
+        for(int i = 0; i < mProjects.size(); i++) {
+            if(mProjects.get(i).getCompletion())
+                continue;
+            builder.append("\nProject : ");
+            if(mProjects.get(i).getName().length() >= NAME_LENGTH)
+                builder.append(mProjects.get(i).getName().substring(0, NAME_LENGTH));
+            else
+                builder.append(mProjects.get(i).getName());
+            builder.append("\nContains: ");
+            if(mProjects.get(i).getTaskNumber() == 0)
+                builder.append("No task.");
+            else if(mProjects.get(i).getTaskNumber() == 1)
+                builder.append("1 task.");
+            else {
+                builder.append(mProjects.get(i).getTaskNumber());
+                builder.append(" tasks.");
+            }
+            builder.append("\nDue on  : ");
+            builder.append(Project.getDateString(mProjects.get(i).getDueDate()));
+            builder.append(" @ ");
+            builder.append(Project.getTimeString(mProjects.get(i).getDueDate()));
+            builder.append("\n");
+        }
+        if(builder.length() == 0)
+            builder.append("There is no ongoing project.");
+        else
+            builder.insert(0, "Ongoing projects:\n");
+        return builder.toString();
+    }
+
+    public String getWarning() {
+        StringBuilder builder = new StringBuilder();
+        for(int i = 0; i < mProjects.size(); i++) {
+            if(mProjects.get(i).getCompletion())
+                continue;
+            Long currentTime = System.currentTimeMillis();
+            Long dueTime = mProjects.get(i).getDueDate().getTime();
+            if(dueTime - currentTime >= 2*24*60*60*1000)
+                continue;
+            else if(dueTime - currentTime < 0) {
+                builder.append("\nProject : ");
+                if(mProjects.get(i).getName().length() >= NAME_LENGTH)
+                    builder.append(mProjects.get(i).getName().substring(0, NAME_LENGTH));
+                else
+                    builder.append(mProjects.get(i).getName());
+                builder.append("\nHas been due on : ");
+                builder.append(Project.getDateString(mProjects.get(i).getDueDate()));
+                builder.append(" @ ");
+                builder.append(Project.getTimeString(mProjects.get(i).getDueDate()));
+                builder.append("!\n\n");
+            } else {
+                builder.append("Project : ");
+                if(mProjects.get(i).getName().length() >= NAME_LENGTH)
+                    builder.append(mProjects.get(i).getName().substring(0, NAME_LENGTH));
+                else
+                    builder.append(mProjects.get(i).getName());
+                builder.append("\nWill be due on  : ");
+                builder.append(Project.getDateString(mProjects.get(i).getDueDate()));
+                builder.append(" @ ");
+                builder.append(Project.getTimeString(mProjects.get(i).getDueDate()));
+                builder.append("!\n");
+            }
+        }
+        if(builder.length() == 0)
+            builder.append("There is no project due in two days.");
+        else
+            builder.insert(0, "Projects due in two days:\n");
+        return builder.toString();
     }
 }

@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,9 +46,7 @@ public class ActivityList extends ActionBarActivity {
             mTimer = new Timer();
         }
 
-        mProjectManager = new ProjectManager(this);
         linkViews();
-        populateFields();
 
         Log.d(TAG, "Activity created");
     }
@@ -62,35 +61,28 @@ public class ActivityList extends ActionBarActivity {
     public void onStart() {
         super.onStart();
         mInSwitching = false;
-        startService(new Intent(this, ServiceMusic.class));
+        mProjectManager = new ProjectManager(this);
         if(mTimer == null) {
             mTimer = new Timer();
         }
+        populateFields();
+        startService(new Intent(this, ServiceMusic.class));
     }
 
     @Override
     public void onStop() {
         if(!mInSwitching)
             stopService(new Intent(this, ServiceMusic.class));
-        mTimer.cancel();
-        mTimer = null;
+        if(mTimer != null) {
+            mTimer.cancel();
+            mTimer = null;
+        }
         super.onStop();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    public void onBackPressed() {
-        finish();
     }
 
     private void populateFields() {
@@ -122,8 +114,8 @@ public class ActivityList extends ActionBarActivity {
                     getTimeDigest(projectID, projectContent),
                     projectContent[ProjectManager.POS_COMPLETION].length() != 0,
                     projectContent[ProjectManager.POS_IMPORTANCE].length() != 0,
-                    getTaskProgress(projectID),
-                    getTimeProgress(projectContent)
+                    getTimeProgress(projectContent),
+                    getTaskProgress(projectID)
             ));
         }
         mListAdapter = new AdapterList(mListContent, this);
@@ -199,11 +191,11 @@ public class ActivityList extends ActionBarActivity {
                 }
                 if(offsetMinute <= 1) {
                     builder.append(offsetMinute);
-                    builder.append(" minute,  left");
+                    builder.append(" minute, ");
                 }
                 else {
                     builder.append(offsetMinute);
-                    builder.append(" minutes,  left");
+                    builder.append(" minutes, ");
                 }
                 if(offsetSecond <= 1) {
                     builder.append(offsetSecond);
@@ -270,6 +262,55 @@ public class ActivityList extends ActionBarActivity {
             mInSwitching = true;
             Intent intent = new Intent(getApplicationContext(), ActivityEdit.class);
             startActivity(intent);
+            return true;
+        }
+
+        if (id == R.id.action_sort_by_creation) {
+            mProjectManager.setDefaultMap();
+            populateFields();
+            Toast.makeText(this, "List Sorted by Creation Time!", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        if (id == R.id.action_sort_by_due) {
+            mProjectManager.setDateDescendingMap();
+            populateFields();
+            Toast.makeText(this, "List Sorted by Due Date!", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        if (id == R.id.action_sort_by_importance) {
+            mProjectManager.setPriorityMap();
+            populateFields();
+            Toast.makeText(this, "List Sorted by Importance!", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+
+        if (id == R.id.action_show_doing) {
+            String report = mProjectManager.getOngoingReport();
+            DialogReport reportDialog = new DialogReport();
+            reportDialog.setContent(report, R.color.dialog_report_text);
+            reportDialog.show(getFragmentManager(), null);
+            Log.d(TAG, report);
+            return true;
+        }
+        if (id == R.id.action_show_warn) {
+            String report = mProjectManager.getWarning();
+            DialogReport reportDialog = new DialogReport();
+            reportDialog.setContent(report, R.color.dialog_warn_text);
+            reportDialog.show(getFragmentManager(), null);
+            Log.d(TAG, report);
+            return true;
+        }
+        if (id == R.id.action_show_about) {
+            StringBuilder builder = new StringBuilder();
+            builder.append("Thank you for using iProject!\n\n");
+            builder.append("Author  : Ling Jin\n");
+            builder.append("Email   : ljin027@uottawa.ca\n");
+            builder.append("Address : uOttawa, ON, Canada\n");
+
+            DialogReport reportDialog = new DialogReport();
+            reportDialog.setContent(builder.toString(), R.color.dialog_about_text);
+            reportDialog.show(getFragmentManager(), null);
+            Log.d(TAG, builder.toString());
             return true;
         }
 

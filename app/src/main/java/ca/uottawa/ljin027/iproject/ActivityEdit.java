@@ -31,6 +31,9 @@ public class ActivityEdit extends ActionBarActivity {
     private static final String PROJECT_INDICATOR = "INDICATOR";
     private static final String TASK_STATE = "TASK_EDITING";
     private static final String TASK_CONTENT = "TASK_CONTENT";
+
+    private static final String DEFAULT_STRING = "Not Provided";
+    private static final String NULL_STRING = "";
     private static final int DEFAULT_TASK_INDEX = -1;
 
     private EditText mView_ProjectName;
@@ -122,10 +125,18 @@ public class ActivityEdit extends ActionBarActivity {
         int prevScrollPosition = mView_Framework.getScrollY();
         String[] projectContent = new String[ProjectManager.POS_MAX];
         mProjectManager.getProjectByID(mTmpID, projectContent);
-        mView_ProjectName.setText(projectContent[ProjectManager.POS_NAME]);
-        mView_ProjectDescription.setText(projectContent[ProjectManager.POS_DESCRIPTION]);
-        mView_CourseName.setText(projectContent[ProjectManager.POS_COURSE_NAME]);
-        mView_CourseInstructor.setText(projectContent[ProjectManager.POS_INSTRUCTOR]);
+        mView_ProjectName.setText(
+                projectContent[ProjectManager.POS_NAME].compareTo(DEFAULT_STRING) == 0 ?
+                NULL_STRING: projectContent[ProjectManager.POS_NAME]);
+        mView_ProjectDescription.setText(
+                projectContent[ProjectManager.POS_DESCRIPTION].compareTo(DEFAULT_STRING) == 0 ?
+                NULL_STRING: projectContent[ProjectManager.POS_DESCRIPTION]);
+        mView_CourseName.setText(
+                projectContent[ProjectManager.POS_COURSE_NAME].compareTo(DEFAULT_STRING) == 0 ?
+                NULL_STRING: projectContent[ProjectManager.POS_COURSE_NAME]);
+        mView_CourseInstructor.setText(
+                projectContent[ProjectManager.POS_INSTRUCTOR].compareTo(DEFAULT_STRING) == 0 ?
+                NULL_STRING: projectContent[ProjectManager.POS_INSTRUCTOR]);
         mView_ProjectStartDate.setText(projectContent[ProjectManager.POS_START_DATE]);
         mView_ProjectStartTime.setText(projectContent[ProjectManager.POS_START_TIME]);
         mView_ProjectDueDate.setText(projectContent[ProjectManager.POS_DUE_DATE]);
@@ -143,9 +154,15 @@ public class ActivityEdit extends ActionBarActivity {
         else {
             mButton_AddTask.setVisibility(View.GONE);
             String[] taskContent = mProjectManager.getTask(mTmpID, mEditingTaskIndex);
-            mView_TaskName.setText(taskContent[ProjectManager.POS_NAME]);
-            mView_TaskDescription.setText(taskContent[ProjectManager.POS_DESCRIPTION]);
-            mView_TaskMembers.setText(taskContent[ProjectManager.POS_MEMBERS]);
+            mView_TaskName.setText(
+                    taskContent[ProjectManager.POS_NAME].compareTo(DEFAULT_STRING) == 0 ?
+                    NULL_STRING: taskContent[ProjectManager.POS_NAME]);
+            mView_TaskDescription.setText(
+                    taskContent[ProjectManager.POS_DESCRIPTION].compareTo(DEFAULT_STRING) == 0 ?
+                    NULL_STRING: taskContent[ProjectManager.POS_DESCRIPTION]);
+            mView_TaskMembers.setText(
+                    taskContent[ProjectManager.POS_MEMBERS].compareTo(DEFAULT_STRING) == 0 ?
+                    NULL_STRING: taskContent[ProjectManager.POS_MEMBERS]);
             mView_TaskStartDate.setText(taskContent[ProjectManager.POS_START_DATE]);
             mView_TaskStartTime.setText(taskContent[ProjectManager.POS_START_TIME]);
             mView_TaskDueDate.setText(taskContent[ProjectManager.POS_DUE_DATE]);
@@ -211,10 +228,10 @@ public class ActivityEdit extends ActionBarActivity {
         String dueDate = mView_ProjectDueDate.getText().toString() + mView_ProjectDueTime.getText().toString();
         mProjectManager.setProject(
                 mTmpID,
-                projectName,
-                projectDescription,
-                instructor,
-                courseName,
+                projectName.length() == 0 ? DEFAULT_STRING: projectName,
+                projectDescription.length() == 0 ? DEFAULT_STRING: projectDescription,
+                instructor.length() == 0 ? DEFAULT_STRING: instructor,
+                courseName.length() == 0 ? DEFAULT_STRING: courseName,
                 startTime,
                 dueDate);
 
@@ -227,9 +244,9 @@ public class ActivityEdit extends ActionBarActivity {
             mProjectManager.setTask(
                     mTmpID,
                     mEditingTaskIndex,
-                    taskName,
-                    taskDescription,
-                    taskMembers,
+                    taskName.length() == 0 ? DEFAULT_STRING: taskName,
+                    taskDescription.length() == 0 ? DEFAULT_STRING: taskDescription,
+                    taskMembers.length() == 0 ? DEFAULT_STRING: taskMembers,
                     taskStartTime,
                     taskDueDate);
         }

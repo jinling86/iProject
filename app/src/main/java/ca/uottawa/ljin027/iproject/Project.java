@@ -11,7 +11,7 @@ import java.util.Date;
 /**
  * Created by ljin027 on 15/04/2015.
  */
-public class Project implements Serializable {
+public class Project implements Serializable, Comparable<Object> {
     public static final long TIME_OFFSET = 60*60*1000;
     public static final int IMPORTANT = 1;
     public static final int UNIMPORTANT = 0;
@@ -30,6 +30,16 @@ public class Project implements Serializable {
     private int mImportance;
     private boolean mCompletion;
     private ArrayList<Task> mTaskList;
+
+    public int compareTo(Object object) {
+        Project anotherProject = (Project)object;
+        if(anotherProject.mDueDate.before(mDueDate))
+            return 1;
+        else if (anotherProject.mDueDate.after(mDueDate))
+            return -1;
+        else
+            return 0;
+    }
 
     private class Task implements Serializable {
         public String id;
