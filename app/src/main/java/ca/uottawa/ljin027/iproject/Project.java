@@ -233,6 +233,8 @@ public class Project implements Serializable, Comparable<Object> {
         mStartTime = aProject.mStartTime;
         mDueDate = aProject.mDueDate;
         mTaskList = aProject.mTaskList;
+        mImportance = aProject.mImportance;
+        mCompletion = aProject.mCompletion;
     }
 
     public static String getTimeString(int hour, int minute) {

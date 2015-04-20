@@ -1,5 +1,6 @@
 package ca.uottawa.ljin027.iproject;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -21,6 +22,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -59,6 +63,7 @@ public class ActivityShow extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        readExternalFile();
         int rotation = getWindow().getWindowManager().getDefaultDisplay().getRotation();
         if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
             setContentView(R.layout.activity_show_landscape);
@@ -107,9 +112,38 @@ public class ActivityShow extends ActionBarActivity {
         mInSwitching = false;
 
         String state = Environment.getExternalStorageState();
-        Toast.makeText(this, "Sharing Needs Valid Mail Account!", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Sharing Needs Valid Mail Account!", Toast.LENGTH_SHORT).show();
 
         Log.d(TAG, "Activity created.");
+    }
+
+    void readExternalFile() {
+        Uri data = getIntent().getData();
+        if(data != null) {
+            Log.d(TAG, "Parsing external file.");
+            if(ContentResolver.SCHEME_CONTENT.equals(data.getScheme())) {
+                try {
+                    ContentResolver resolver = getContentResolver();
+                    InputStream is = resolver.openInputStream(data);
+                    if(is != null) {
+                        ObjectInputStream ois = new ObjectInputStream(is);
+                        Project project = (Project) ois.readObject();
+                        if(project != null) {
+                            mProjectManager = new ProjectManager(this);
+                            mProjectID = mProjectManager.addProjectFromExternal(project);
+                            Log.d(TAG, "Parsing external successfully.");
+                            Toast.makeText(this, "File Imported!", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                    }
+                }
+                catch (ClassNotFoundException | IOException e) {
+                    Log.d(TAG, e.getMessage());
+                }
+            }
+            Log.d(TAG, "Parsing external failed.");
+            finish();
+        }
     }
 
     @Override
@@ -211,12 +245,12 @@ public class ActivityShow extends ActionBarActivity {
         else
             mButton_ImportanceMarker.setBackgroundResource(R.drawable.ic_unimportant);
         if(mCurrentCompletion) {
-            mButton_Done.setVisibility(View.GONE);
+            mButton_Done.setVisibility(View.INVISIBLE);
             mButton_Delete.setVisibility(View.VISIBLE);
         }
         else {
             mButton_Done.setVisibility(View.VISIBLE);
-            mButton_Delete.setVisibility(View.GONE);
+            mButton_Delete.setVisibility(View.INVISIBLE);
         }
 
         mCurrentCompletedTasks = 0;

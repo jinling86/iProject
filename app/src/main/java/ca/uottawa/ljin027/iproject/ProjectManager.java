@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.PriorityQueue;
 import java.util.TreeMap;
@@ -25,6 +26,7 @@ public class ProjectManager {
     public static final String PROJECT_ID = "id";
     public static final String ERROR_MSG = "";
     public static final String BOOLEAN_MSG = "true";
+    public static final String NO_WARNING = "There is no project due in two days.";
     public static final int POS_NAME = 0;
     public static final int POS_DESCRIPTION = 1;
     public static final int POS_START_TIME = 2;
@@ -107,8 +109,10 @@ public class ProjectManager {
         project.setDescription(ERROR_MSG);
         project.setInstructor(ERROR_MSG);
         project.setCourseName(ERROR_MSG);
-        long currentTime = System.currentTimeMillis();
-        long anHourLater = currentTime + 60*60*1000;
+        Calendar now = Calendar.getInstance();
+        long currentTime = now.getTimeInMillis();;
+        now.add(Calendar.HOUR, 1);
+        long anHourLater = now.getTimeInMillis();
         project.setStartTime(new Date(currentTime));
         project.setDueDate(new Date(anHourLater));
         project.setCompletion(false);
@@ -116,6 +120,15 @@ public class ProjectManager {
         mProjects.add(project);
         saveProjects();
         Log.d(TAG, "Created a new project.");
+        return project.getId();
+    }
+
+    public String addProjectFromExternal(Project exProject) {
+        Project project = new Project();
+        project.copy(exProject);
+        mProjects.add(project);
+        saveProjects();
+        Log.d(TAG, "Imported a new project.");
         return project.getId();
     }
 
@@ -482,7 +495,7 @@ public class ProjectManager {
                 builder.append(Project.getTimeString(mProjects.get(i).getDueDate()));
                 builder.append("!\n\n");
             } else {
-                builder.append("Project : ");
+                builder.append("\nProject : ");
                 if(mProjects.get(i).getName().length() >= NAME_LENGTH)
                     builder.append(mProjects.get(i).getName().substring(0, NAME_LENGTH));
                 else
@@ -495,7 +508,7 @@ public class ProjectManager {
             }
         }
         if(builder.length() == 0)
-            builder.append("There is no project due in two days.");
+            builder.append(NO_WARNING);
         else
             builder.insert(0, "Projects due in two days:\n");
         return builder.toString();

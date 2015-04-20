@@ -1,6 +1,7 @@
 package ca.uottawa.ljin027.iproject;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -30,11 +31,15 @@ public class ActivityList extends ActionBarActivity {
     ArrayList<ListList> mListContent;
 
     private final String TAG = "<<<< Activity List >>>>";
+    private final String SORT_PREFERENCE = "SortBy";
+    private final int SORT_BY_CREATED_TIME = 0;
+    private final int SORT_BY_DUE_TIME = 1;
+    private final int SORT_BY_IMPORTANCE = 2;
+    private static boolean mFirstLaunch = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_list);
 
         // Set the action bar style
@@ -62,11 +67,21 @@ public class ActivityList extends ActionBarActivity {
         super.onStart();
         mInSwitching = false;
         mProjectManager = new ProjectManager(this);
+        sortProjects();
         if(mTimer == null) {
             mTimer = new Timer();
         }
         populateFields();
         startService(new Intent(this, ServiceMusic.class));
+        if(mFirstLaunch) {
+            mFirstLaunch = false;
+            String report = mProjectManager.getWarning();
+            if(report.compareTo(ProjectManager.NO_WARNING) != 0) {
+                DialogReport reportDialog = new DialogReport();
+                reportDialog.setContent(report, R.color.dialog_warn_text);
+                reportDialog.show(getFragmentManager(), null);
+            }
+        }
     }
 
     @Override
@@ -95,6 +110,16 @@ public class ActivityList extends ActionBarActivity {
             mView_ProjectList.setVisibility(View.GONE);
             mView_ProjectHint.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void sortProjects() {
+        int sortMethod = getPreferences(MODE_PRIVATE).getInt(SORT_PREFERENCE, SORT_BY_CREATED_TIME);
+        if(sortMethod == SORT_BY_DUE_TIME)
+            mProjectManager.setDateDescendingMap();
+        else if(sortMethod == SORT_BY_IMPORTANCE)
+            mProjectManager.setPriorityMap();
+        else
+            mProjectManager.setDefaultMap();
     }
 
     private void fillList() {
@@ -268,18 +293,27 @@ public class ActivityList extends ActionBarActivity {
         if (id == R.id.action_sort_by_creation) {
             mProjectManager.setDefaultMap();
             populateFields();
+            SharedPreferences.Editor savor = getPreferences(MODE_PRIVATE).edit();
+            savor.putInt(SORT_PREFERENCE, SORT_BY_CREATED_TIME);
+            savor.commit();
             Toast.makeText(this, "List Sorted by Creation Time!", Toast.LENGTH_SHORT).show();
             return true;
         }
         if (id == R.id.action_sort_by_due) {
             mProjectManager.setDateDescendingMap();
             populateFields();
+            SharedPreferences.Editor savor = getPreferences(MODE_PRIVATE).edit();
+            savor.putInt(SORT_PREFERENCE, SORT_BY_DUE_TIME);
+            savor.commit();
             Toast.makeText(this, "List Sorted by Due Date!", Toast.LENGTH_SHORT).show();
             return true;
         }
         if (id == R.id.action_sort_by_importance) {
             mProjectManager.setPriorityMap();
             populateFields();
+            SharedPreferences.Editor savor = getPreferences(MODE_PRIVATE).edit();
+            savor.putInt(SORT_PREFERENCE, SORT_BY_IMPORTANCE);
+            savor.commit();
             Toast.makeText(this, "List Sorted by Importance!", Toast.LENGTH_SHORT).show();
             return true;
         }

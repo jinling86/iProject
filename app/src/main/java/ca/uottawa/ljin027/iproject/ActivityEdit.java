@@ -57,7 +57,6 @@ public class ActivityEdit extends ActionBarActivity {
 
     private ListView mList_UpperPart;
     private ListView mList_LowerPart;
-    private ScrollView mView_Framework;
 
     private String mProjectID;
     private String mTmpID;
@@ -122,7 +121,6 @@ public class ActivityEdit extends ActionBarActivity {
     }
 
     private void populateFields() {
-        int prevScrollPosition = mView_Framework.getScrollY();
         String[] projectContent = new String[ProjectManager.POS_MAX];
         mProjectManager.getProjectByID(mTmpID, projectContent);
         mView_ProjectName.setText(
@@ -173,8 +171,6 @@ public class ActivityEdit extends ActionBarActivity {
             fillList(mList_UpperPart, 0, mEditingTaskIndex);
             fillList(mList_LowerPart, mEditingTaskIndex + 1, taskNumber);
         }
-
-        mView_Framework.setScrollY(prevScrollPosition);
     }
 
     private void fillList(ListView listView, int taskStart, int taskEnd) {
@@ -274,7 +270,6 @@ public class ActivityEdit extends ActionBarActivity {
 
         mList_UpperPart = (ListView) findViewById(R.id.edit_list_upperList);
         mList_LowerPart = (ListView) findViewById(R.id.edit_list_lowerList);
-        mView_Framework = (ScrollView) findViewById(R.id.edit_scrollView);
 
         mView_ProjectStartTime.setOnClickListener(new TimeSetter(mView_ProjectStartTime));
         mView_ProjectDueTime.setOnClickListener(new TimeSetter(mView_ProjectDueTime));
