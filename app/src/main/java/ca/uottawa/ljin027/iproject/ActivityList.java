@@ -100,6 +100,12 @@ public class ActivityList extends ActionBarActivity {
         super.onConfigurationChanged(newConfig);
     }
 
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+        finish();
+    }
+
     private void populateFields() {
         int projectNumber = mProjectManager.getProjectNumber();
         if(projectNumber != 0) {
