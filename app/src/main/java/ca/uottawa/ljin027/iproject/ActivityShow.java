@@ -156,11 +156,12 @@ public class ActivityShow extends ActionBarActivity {
                         }
                     }
                 } catch (ClassNotFoundException | IOException e) {
-                    Log.d(TAG, e.getMessage());
+                    Log.d(TAG, e.toString());
                 }
             }
             // Finish current activity if file phasing failure
             Log.d(TAG, "Parsing external failed.");
+            Toast.makeText(this, "File Import Failed!", Toast.LENGTH_SHORT).show();
             finish();
         }
     }
