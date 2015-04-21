@@ -250,7 +250,7 @@ public class Project implements Serializable, Comparable<Object> {
         mCourseInstructor = aProject.mCourseInstructor;
         mStartTime = aProject.mStartTime;
         mDueDate = aProject.mDueDate;
-        mTaskList = aProject.mTaskList;
+        mTaskList = new ArrayList<Task>(aProject.mTaskList);
         mImportance = aProject.mImportance;
         mCompletion = aProject.mCompletion;
     }

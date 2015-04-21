@@ -308,6 +308,7 @@ public class ActivityEdit extends ActionBarActivity {
                     String dueDate = mView_ProjectDueDate.getText().toString() + mView_ProjectDueTime.getText().toString();
                     mProjectManager.addTask(mTmpID, startTime, dueDate);
                     mEditingTaskIndex = mProjectManager.getTaskNumber(mTmpID) - 1;
+                    mEditingTaskContents = mProjectManager.getTask(mTmpID, mEditingTaskIndex);
                     populateFields();
                     closeKeyboard();
                 }
@@ -356,11 +357,12 @@ public class ActivityEdit extends ActionBarActivity {
                     mProjectManager.setTask(
                             mTmpID,
                             mEditingTaskIndex,
-                            mEditingTaskContents[ProjectManager.POS_NAME],
-                            mEditingTaskContents[ProjectManager.POS_DESCRIPTION],
-                            mEditingTaskContents[ProjectManager.POS_MEMBERS],
+                            (mEditingTaskContents[ProjectManager.POS_NAME].length() == 0 ?  DEFAULT_STRING : mEditingTaskContents[ProjectManager.POS_NAME]),
+                            (mEditingTaskContents[ProjectManager.POS_DESCRIPTION].length() == 0 ?  DEFAULT_STRING : mEditingTaskContents[ProjectManager.POS_DESCRIPTION]),
+                            (mEditingTaskContents[ProjectManager.POS_MEMBERS].length() == 0 ?  DEFAULT_STRING : mEditingTaskContents[ProjectManager.POS_MEMBERS]),
                             mEditingTaskContents[ProjectManager.POS_START_DATE] + mEditingTaskContents[ProjectManager.POS_START_TIME],
                             mEditingTaskContents[ProjectManager.POS_DUE_DATE] + mEditingTaskContents[ProjectManager.POS_DUE_TIME]);
+                    mEditingTaskIndex = DEFAULT_TASK_INDEX;
                     populateFields();
                 } else {
                     Log.d(TAG, "Internal state error!");
@@ -480,10 +482,7 @@ public class ActivityEdit extends ActionBarActivity {
 
     @Override
     protected void onStop() {
-        if (mTmpID != null) {
-            Log.d(TAG, "Activity switched out, discard changes");
-            mProjectManager.deleteProject(mTmpID);
-        }
+        Log.d(TAG, "Activity switched out");
         if (!mInSwitching)
             stopService(new Intent(this, ServiceMusic.class));
         super.onStop();
