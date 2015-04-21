@@ -42,6 +42,7 @@ public class ActivityList extends ActionBarActivity {
 
     private final String TAG = "<<<< Activity List >>>>";
     private final String SORT_PREFERENCE = "SortBy";
+    private final String EXAMPLE_PREFERENCE = "Example";
     private final int SORT_BY_CREATED_TIME = 0;
     private final int SORT_BY_DUE_TIME = 1;
     private final int SORT_BY_IMPORTANCE = 2;
@@ -77,6 +78,7 @@ public class ActivityList extends ActionBarActivity {
         super.onStart();
         mInSwitching = false;
         mProjectManager = new ProjectManager(this);
+        makeAnExample();
         sortProjects();
         // Use a timer to update remaining time
         if (mTimer == null) {
@@ -142,6 +144,37 @@ public class ActivityList extends ActionBarActivity {
             mProjectManager.setPriorityMap();
         else
             mProjectManager.setDefaultMap();
+    }
+
+    private void makeAnExample() {
+        // Add an example project into system
+        boolean exampleAdded = getPreferences(MODE_PRIVATE).getBoolean(EXAMPLE_PREFERENCE, false);
+        if(exampleAdded == false) {
+            SharedPreferences.Editor savor = getPreferences(MODE_PRIVATE).edit();
+            savor.putBoolean(EXAMPLE_PREFERENCE, true);
+            savor.commit();
+            if(mProjectManager.getProjectNumber() == 0) {
+                String id = mProjectManager.addProject();
+                long currentTime = System.currentTimeMillis();
+                Date dayBefore = new Date(currentTime - 24*60*60*1000);
+                Date dayAfter = new Date(currentTime + 24*60*60*1000);
+                String startTime = Project.getDateString(dayBefore) + Project.getTimeString(dayBefore);
+                String dueDate = Project.getDateString(dayAfter) + Project.getTimeString(dayAfter);
+                mProjectManager.setProject(
+                        id,
+                        "An Example Project",
+                        "It is an example project!",
+                        "Nancy ",
+                        "CSI 5175",
+                        startTime,
+                        dueDate
+                );
+                mProjectManager.addTask(id, startTime, dueDate);
+                mProjectManager.setTask(id, 0, "Task 1", "Example task 1", "Ling", startTime, dueDate );
+                mProjectManager.addTask(id, startTime, dueDate);
+                mProjectManager.setTask(id, 1, "Task 2", "Example task 2", "Ling", startTime, dueDate );
+            }
+        }
     }
 
     private void fillList() {

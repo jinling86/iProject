@@ -38,6 +38,7 @@ import java.util.Date;
  * invoke mail apps to send it out. It can also read and import the ipj file from external storage.
  * The newly imported file has a newly assigned internal name, so a file can be imported for
  * multiple times.
+ * The app should go back to the list activity when finish.
  *
  * @author Ling Jin
  * @version 1.0

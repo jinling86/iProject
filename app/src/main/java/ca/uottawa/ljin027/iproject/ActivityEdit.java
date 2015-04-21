@@ -29,6 +29,8 @@ import java.util.List;
  * This class supports the editing of a project. This includes modifying contents of the project,
  * adding, deleting, modifying sub-tasks of the project, ensuring the date and time is right in
  * order to be used in the following comparison.
+ * The app should go back to the invoking activity after editing.
+ * The screen rotation is forbidden in this activity.
  *
  * @author Ling Jin
  * @version 1.0
