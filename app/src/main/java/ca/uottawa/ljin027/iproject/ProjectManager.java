@@ -381,6 +381,21 @@ public class ProjectManager {
         return ERROR_MSG;
     }
 
+    public void deleteDuplicatedProjects() {
+        ArrayList<Project> toDelete = new ArrayList<Project>();
+        for(Project project: mProjects) {
+            if(project.isDuplicated()) {
+                Log.d(TAG, "Remove duplicated project " + project.getId());
+                toDelete.add(project);
+            }
+        }
+        if(toDelete.size() != 0) {
+            mProjects.removeAll(toDelete);
+            saveProjects();
+            setDefaultMap();
+        }
+    }
+
     private void readProjects() {
         try {
             FileInputStream fis = mContext.openFileInput(FILE_NAME);
@@ -389,7 +404,7 @@ public class ProjectManager {
             ois.close();
             if (mProjects != null) {
                 for (Project project : mProjects) {
-                    Log.d(TAG, "Recovered project " + project.getName());
+                    Log.d(TAG, "Recovered project " + project.getId());
                 }
             }
             int projectNumber = mProjects.size();
@@ -430,6 +445,7 @@ public class ProjectManager {
             Log.d(TAG, "Projects copy unsuccessfully!!");
         } else {
             dstProject.copy(srcProject);
+            dstProject.setDuplicated(true);
             saveProjects();
         }
     }

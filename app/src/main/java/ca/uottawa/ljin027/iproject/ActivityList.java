@@ -78,6 +78,7 @@ public class ActivityList extends ActionBarActivity {
         super.onStart();
         mInSwitching = false;
         mProjectManager = new ProjectManager(this);
+        mProjectManager.deleteDuplicatedProjects();
         makeAnExample();
         sortProjects();
         // Use a timer to update remaining time

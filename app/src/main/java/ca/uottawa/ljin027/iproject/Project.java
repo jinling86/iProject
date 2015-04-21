@@ -36,6 +36,7 @@ public class Project implements Serializable, Comparable<Object> {
     private Date mDueDate;
     private int mImportance;
     private boolean mCompletion;
+    private boolean mDuplicated;
     private ArrayList<Task> mTaskList;
 
     public int compareTo(Object object) {
@@ -62,6 +63,7 @@ public class Project implements Serializable, Comparable<Object> {
     public Project() {
         Long currentTime = System.currentTimeMillis();
         mId = String.valueOf(currentTime);
+        mDuplicated = false;
         mTaskList = new ArrayList<Task>();
     }
 
@@ -127,6 +129,14 @@ public class Project implements Serializable, Comparable<Object> {
 
     public boolean getCompletion() {
         return mCompletion;
+    }
+
+    public void setDuplicated(boolean duplicated) {
+        mDuplicated = duplicated;
+    }
+
+    public boolean isDuplicated() {
+        return mDuplicated;
     }
 
     public boolean isMe(String id) {
