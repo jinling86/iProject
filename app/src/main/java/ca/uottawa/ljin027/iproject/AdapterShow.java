@@ -12,7 +12,7 @@ import android.widget.TextView;
 import java.util.List;
 
 /**
- * This class is implemented for CSI5175 Assignment 3.
+ * This class is implemented for CSI5175 Bonus Assignment.
  * This class defines the data structure used in the following array adapter.
  *
  * @author Ling Jin
@@ -76,7 +76,7 @@ class ShowList {
 }
 
 /**
- * This class is implemented for CSI5175 Assignment 3.
+ * This class is implemented for CSI5175 Bonus Assignment.
  * This class implements an adapter for populating the fields of the list view. The adapter supports
  * the check box in the list view.
  *
@@ -118,6 +118,8 @@ public class AdapterShow extends ArrayAdapter<ShowList> {
             viewHolder.from = (TextView) aRow.findViewById(R.id.showList_text_taskStartTime);
             viewHolder.to = (TextView) aRow.findViewById(R.id.showList_text_taskDueDate);
             viewHolder.completed = (CheckBox) aRow.findViewById(R.id.showList_check_complete);
+
+            // Use a tag to distinguish clicking position of the user, it helps a lot
             viewHolder.completed.setTag(position);
             viewHolder.hint = (TextView) aRow.findViewById(R.id.showList_text_completionHint);
 

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * This class is implemented for CSI5175 Assignment 3.
+ * This class is implemented for CSI5175 Bonus Assignment.
  * This class defines the project fields and their corresponding formats. It also provide a
  * comparator for the generic sort method. The compare is perform by comparing due date.
  *
@@ -21,6 +21,7 @@ public class Project implements Serializable, Comparable<Object> {
     public static final long TIME_OFFSET = 60 * 60 * 1000;
     public static final int IMPORTANT = 1;
     public static final int UNIMPORTANT = 0;
+    // System wide format of date and time
     private static SimpleDateFormat mTimeFormat = new SimpleDateFormat(" kk : mm");
     private static SimpleDateFormat mDateFormat = new SimpleDateFormat("MMM dd, yyyy");
     private static SimpleDateFormat mDateTimeFormat = new SimpleDateFormat("MMM dd, yyyy kk : mm");
@@ -38,6 +39,7 @@ public class Project implements Serializable, Comparable<Object> {
     private ArrayList<Task> mTaskList;
 
     public int compareTo(Object object) {
+        // Compare by due date
         Project anotherProject = (Project) object;
         if (anotherProject.mDueDate.before(mDueDate))
             return 1;
@@ -202,6 +204,8 @@ public class Project implements Serializable, Comparable<Object> {
     }
 
     public void addTask(String name, String description, String members, Date startTime, Date dueDate) {
+        // Task always has an internal id, which is the string of current time
+        // Discard the id of imported file, use internal id only
         Task task = new Task();
         Long currentTime = System.currentTimeMillis();
         task.id = String.valueOf(currentTime);
@@ -239,6 +243,7 @@ public class Project implements Serializable, Comparable<Object> {
     }
 
     void copy(Project aProject) {
+        // A copy method
         mName = aProject.mName;
         mDescription = aProject.mDescription;
         mCourseName = aProject.mCourseName;

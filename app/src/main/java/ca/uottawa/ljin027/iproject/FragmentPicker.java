@@ -14,7 +14,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * This class is implemented for CSI5175 Assignment 3.
+ * This class is implemented for CSI5175 Bonus Assignment.
  * This class implements a time and date picker. The time and date is constrained as follows:
  *
  * Project start time should be earlier than the start time of any sub-tasks;
@@ -88,6 +88,7 @@ public class FragmentPicker extends DialogFragment
     public void onDateSet(DatePicker view, int year, int month, int day) {
         String newDateString = Project.getDateString(year, month, day);
         Date newDate = Project.getDate(newDateString + mOrgTimeString);
+        // Check to make sure the selected time can put into further usage
         if (newDate.before(mLowerBound) || newDate.after(mUpperBound)) {
             mEditText.setText(mOrgDateString);
             Toast.makeText(getActivity(), "Date range error!", Toast.LENGTH_SHORT).show();
@@ -111,6 +112,7 @@ public class FragmentPicker extends DialogFragment
     }
 
     private void adjustDueDate(Date startTime) {
+        // Adjust the due date if the new start time is after the due date
         if (mView_DueDate != null && mView_DueTime != null) {
             Date dueDate = Project.getDate(
                     mView_DueDate.getText().toString() + mView_DueTime.getText().toString());

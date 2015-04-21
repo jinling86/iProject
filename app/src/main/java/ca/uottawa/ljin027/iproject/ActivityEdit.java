@@ -25,9 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * This class is implemented for CSI5175 Assignment 3.
+ * This class is implemented for CSI5175 Bonus Assignment.
  * This class supports the editing of a project. This includes modifying contents of the project,
- * adding, deleting, modifying sub-tasks of the project, assuming the date and time is right in
+ * adding, deleting, modifying sub-tasks of the project, ensuring the date and time is right in
  * order to be used in the following comparison.
  *
  * @author Ling Jin
@@ -69,8 +69,10 @@ public class ActivityEdit extends ActionBarActivity {
 
     private String mProjectID;
     private String mTmpID;
+    // New project indicates this activity is started from activity list, not activity show
     private boolean mNewProject;
     private ProjectManager mProjectManager;
+    // In switching indicates another activity of the app is started when this activity is stopped
     private boolean mInSwitching = false;
 
     private int mEditingTaskIndex = DEFAULT_TASK_INDEX;
@@ -81,7 +83,6 @@ public class ActivityEdit extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_edit);
 
         // Set the action bar style
@@ -95,6 +96,7 @@ public class ActivityEdit extends ActionBarActivity {
         mNewProject = false;
         mTmpID = null;
         mProjectID = "";
+        // Restore the intent contents
         if (savedInstanceState != null) {
             mProjectID = (String) savedInstanceState.getSerializable(PROJECT_ID);
             mTmpID = (String) savedInstanceState.getSerializable(PROJECT_TMP_ID);
@@ -105,6 +107,7 @@ public class ActivityEdit extends ActionBarActivity {
 
             startService(new Intent(this, ServiceMusic.class));
         } else {
+            // Get the project ID to be edited
             Bundle extras = getIntent().getExtras();
             if (extras != null) {
                 mProjectID = extras.getString(ProjectManager.PROJECT_ID);
@@ -114,6 +117,7 @@ public class ActivityEdit extends ActionBarActivity {
         }
 
         mProjectManager = new ProjectManager(this);
+        // Use a temporary file for editing, so we can discard editing at any time
         if (mTmpID == null) {
             mTmpID = mProjectManager.addProject();
             if (!mNewProject) {
@@ -130,6 +134,7 @@ public class ActivityEdit extends ActionBarActivity {
     private void populateFields() {
         String[] projectContent = new String[ProjectManager.POS_MAX];
         mProjectManager.getProjectByID(mTmpID, projectContent);
+        // Do a conversion if the length of the string is 0
         mView_ProjectName.setText(
                 projectContent[ProjectManager.POS_NAME].compareTo(DEFAULT_STRING) == 0 ?
                         NULL_STRING : projectContent[ProjectManager.POS_NAME]);
@@ -172,6 +177,7 @@ public class ActivityEdit extends ActionBarActivity {
             mView_TaskDueDate.setText(taskContent[ProjectManager.POS_DUE_DATE]);
             mView_TaskDueTime.setText(taskContent[ProjectManager.POS_DUE_TIME]);
 
+            // Split the list view into threes parts to demonstrate which item is being modified
             mLayout_EditTask.setVisibility(View.VISIBLE);
             int taskNumber = mProjectManager.getTaskNumber(mTmpID);
             fillList(mList_UpperPart, 0, mEditingTaskIndex);
@@ -180,6 +186,7 @@ public class ActivityEdit extends ActionBarActivity {
     }
 
     private void fillList(ListView listView, int taskStart, int taskEnd) {
+        // Use a simple adapter to fill the list
         String[] from = new String[]{"name", "description", "members", "start", "end"};
         int[] to = new int[]{
                 R.id.list_text_taskName,
@@ -215,6 +222,7 @@ public class ActivityEdit extends ActionBarActivity {
             totalHeight += listItem.getMeasuredHeight();
         }
 
+        // Resize the list view when its content is modified
         ViewGroup.LayoutParams params = listView.getLayoutParams();
         params.height = totalHeight + (listView.getDividerHeight() * (adapter.getCount() - 1));
         listView.setLayoutParams(params);
@@ -222,6 +230,7 @@ public class ActivityEdit extends ActionBarActivity {
     }
 
     private void update() {
+        // Read user input
         String projectName = mView_ProjectName.getText().toString();
         String projectDescription = mView_ProjectDescription.getText().toString();
         String courseName = mView_CourseName.getText().toString();
@@ -290,6 +299,7 @@ public class ActivityEdit extends ActionBarActivity {
         mButton_AddTask.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Add a new task, using the start time and due time of the project as default
                 if (mEditingTaskIndex == DEFAULT_TASK_INDEX) {
                     update();
                     String startTime = mView_ProjectStartDate.getText().toString() + mView_ProjectStartTime.getText().toString();
@@ -306,6 +316,7 @@ public class ActivityEdit extends ActionBarActivity {
         button_DeleteTask.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Delete a task the reset the input state
                 if (mEditingTaskIndex != DEFAULT_TASK_INDEX) {
                     mProjectManager.deleteTask(mTmpID, mEditingTaskIndex);
                     mEditingTaskIndex = DEFAULT_TASK_INDEX;
@@ -322,6 +333,7 @@ public class ActivityEdit extends ActionBarActivity {
         button_SaveTask.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Save the modified task, reset the input state
                 if (mEditingTaskIndex != DEFAULT_TASK_INDEX) {
                     update();
                     mEditingTaskIndex = DEFAULT_TASK_INDEX;
@@ -337,6 +349,7 @@ public class ActivityEdit extends ActionBarActivity {
         button_CancelTask.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Restore previous data
                 if (mEditingTaskIndex != DEFAULT_TASK_INDEX) {
                     mProjectManager.setTask(
                             mTmpID,
@@ -357,6 +370,7 @@ public class ActivityEdit extends ActionBarActivity {
         button_DeleteProject.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Delete current project
                 mProjectManager.deleteProject(mTmpID);
                 mTmpID = null;
                 mInSwitching = true;
@@ -369,6 +383,7 @@ public class ActivityEdit extends ActionBarActivity {
     }
 
     public void onButtonEditTaskClick(View view) {
+        // Set the input state as task editing
         if (mEditingTaskIndex == DEFAULT_TASK_INDEX) {
             mEditingTaskIndex = mList_UpperPart.getPositionForView((View) view.getParent());
             mEditingTaskContents = mProjectManager.getTask(mTmpID, mEditingTaskIndex);
@@ -407,6 +422,7 @@ public class ActivityEdit extends ActionBarActivity {
         if (id == R.id.action_save_project) {
             update();
             if (mNewProject) {
+                // Save current modification and display the project
                 Intent intent = new Intent(this, ActivityShow.class);
                 intent.putExtra(ProjectManager.PROJECT_ID, mTmpID);
                 mTmpID = null;
@@ -414,6 +430,7 @@ public class ActivityEdit extends ActionBarActivity {
                 startActivity(intent);
                 finish();
             } else {
+                // Discard modification and go back to the previous activity
                 mProjectManager.destroyTmpProject(mTmpID, mProjectID);
                 mTmpID = null;
                 mInSwitching = true;
@@ -430,6 +447,7 @@ public class ActivityEdit extends ActionBarActivity {
 
     @Override
     public Intent getSupportParentActivityIntent() {
+        // Discard modification and go back to the previous activity
         if (mNewProject) {
             mProjectManager.deleteProject(mTmpID);
             mTmpID = null;
@@ -661,6 +679,7 @@ public class ActivityEdit extends ActionBarActivity {
     }
 
     private void closeKeyboard() {
+        // Hide the keyboard when the activity startup.
         InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         View view = getCurrentFocus();
         if (view != null) {

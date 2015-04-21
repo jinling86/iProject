@@ -13,7 +13,7 @@ import android.widget.TextView;
 import java.util.List;
 
 /**
- * This class is implemented for CSI5175 Assignment 3.
+ * This class is implemented for CSI5175 Bonus Assignment.
  * This class defines the data structure used in the following array adapter.
  *
  * @author Ling Jin
@@ -86,7 +86,7 @@ class ListList {
 }
 
 /**
- * This class is implemented for CSI5175 Assignment 3.
+ * This class is implemented for CSI5175 Bonus Assignment.
  * This class implements an adapter for populating the fields of the list view. The adapter provides
  * supports for progress bars and image buttons in the list view.
  *
@@ -143,6 +143,7 @@ public class AdapterList extends ArrayAdapter<ListList> {
         viewHolder.course.setText(listItem.getCourseDigest());
         viewHolder.task.setText(listItem.getTaskDigest());
         viewHolder.remainder.setText(listItem.getTimeDigest());
+        // Select different icons
         if (listItem.isCompleted())
             viewHolder.completion.setBackgroundResource(R.drawable.ic_done);
         else

@@ -19,7 +19,7 @@ import java.util.TreeMap;
 
 
 /**
- * This class is implemented for CSI5175 Assignment 3.
+ * This class is implemented for CSI5175 Bonus Assignment.
  * This class manages projects and their tasks. It manages project file read and write, generates
  * project reports, and provide interfaces for the Activities in the system.
  *
@@ -33,6 +33,8 @@ public class ProjectManager {
     public static final String ERROR_MSG = "";
     public static final String BOOLEAN_MSG = "true";
     public static final String NO_WARNING = "There is no project due in two days.";
+    // POS_ defines the items in the string array which contain information of project/task
+    // An array is used to conveniently get the project/task contents
     public static final int POS_NAME = 0;
     public static final int POS_DESCRIPTION = 1;
     public static final int POS_START_TIME = 2;
@@ -50,9 +52,11 @@ public class ProjectManager {
     private final String FILE_NAME = "projects";
     private final String FILE_NAME_PREFIX = "iProject_";
     private final String FILE_NAME_SUFFIX = ".ipj";
+    // Max length of the name string in the report
     private final int NAME_LENGTH = 30;
 
     private ArrayList<Project> mProjects;
+    // A map is used here to manage the sorted projects
     private TreeMap<Integer, Integer> mMap;
     private Context mContext;
 
@@ -292,6 +296,7 @@ public class ProjectManager {
     }
 
     public void setDefaultMap() {
+        // Default sorting method, do nothing
         mMap = new TreeMap<Integer, Integer>();
         for (int i = 0; i < mProjects.size(); i++) {
             mMap.put(i, i);
@@ -299,6 +304,8 @@ public class ProjectManager {
     }
 
     public void setPriorityMap() {
+        // Sort by importance
+        // The project has a same importance but has a earlier due date is consider more important
         setDateDescendingMap();
         TreeMap<Integer, Integer> sortedMap = mMap;
         mMap = new TreeMap<Integer, Integer>();
@@ -318,6 +325,7 @@ public class ProjectManager {
     }
 
     public void setDateDescendingMap() {
+        // Sort by due date
         PriorityQueue<Project> sorted = new PriorityQueue<Project>(mProjects);
         mMap = new TreeMap<Integer, Integer>();
         int i = 0;
@@ -343,6 +351,8 @@ public class ProjectManager {
     }
 
     public String saveOneProject(String id) {
+        // Save a project for exporting
+        // Only use external storage can the file be read by the mail app
         String state = Environment.getExternalStorageState();
         if (!Environment.MEDIA_MOUNTED.equals(state)) {
             Toast.makeText(mContext, "Cannot Access to External Storage!", Toast.LENGTH_SHORT).show();
@@ -401,6 +411,7 @@ public class ProjectManager {
     }
 
     public void destroyTmpProject(String tmpID, String projectID) {
+        // Copy the temporary project to the original project and delete the temporary one
         Project orgProject = findProject(projectID);
         Project tmpProject = findProject(tmpID);
         if (orgProject == null || tmpProject == null) {
@@ -434,6 +445,7 @@ public class ProjectManager {
     }
 
     public String getOngoingReport() {
+        // Generate report
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < mProjects.size(); i++) {
             if (mProjects.get(i).getCompletion())
@@ -466,6 +478,7 @@ public class ProjectManager {
     }
 
     public String getWarning() {
+        // Generate warning
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < mProjects.size(); i++) {
             if (mProjects.get(i).getCompletion())

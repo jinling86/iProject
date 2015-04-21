@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * This class is implemented for CSI5175 Assignment 3.
+ * This class is implemented for CSI5175 Bonus Assignment.
  * This class displays the detail information of a project in the UI. It also computes the remaining
  * time and tasks of the project.
  * The project and sub-tasks can be marked as done in this activity. After marking as done, the
@@ -52,6 +52,7 @@ public class ActivityShow extends ActionBarActivity {
     private ProjectManager mProjectManager;
     private String mProjectID;
     private String[] mProjectContents;
+    // In switching indicates another activity of the app is started when this activity is stopped
     private boolean mInSwitching;
     private boolean mCurrentImportance;
     private boolean mCurrentCompletion;
@@ -78,7 +79,10 @@ public class ActivityShow extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Process file import
         readExternalFile();
+
+        // Use different layout configurations
         int rotation = getWindow().getWindowManager().getDefaultDisplay().getRotation();
         if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
             setContentView(R.layout.activity_show_landscape);
@@ -124,7 +128,7 @@ public class ActivityShow extends ActionBarActivity {
         populateFields();
         mInSwitching = false;
 
-        String state = Environment.getExternalStorageState();
+        // A hint
         Toast.makeText(this, "Sharing Needs Valid Mail Account!", Toast.LENGTH_SHORT).show();
 
         Log.d(TAG, "Activity created.");
@@ -136,6 +140,7 @@ public class ActivityShow extends ActionBarActivity {
             Log.d(TAG, "Parsing external file.");
             if (ContentResolver.SCHEME_CONTENT.equals(data.getScheme())) {
                 try {
+                    // Read project and add it into system
                     ContentResolver resolver = getContentResolver();
                     InputStream is = resolver.openInputStream(data);
                     if (is != null) {
@@ -153,6 +158,7 @@ public class ActivityShow extends ActionBarActivity {
                     Log.d(TAG, e.getMessage());
                 }
             }
+            // Finish current activity if file phasing failure
             Log.d(TAG, "Parsing external failed.");
             finish();
         }
@@ -161,6 +167,7 @@ public class ActivityShow extends ActionBarActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        // Fill views when rotate screen
         int rotation = getWindow().getWindowManager().getDefaultDisplay().getRotation();
         if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
             setContentView(R.layout.activity_show_landscape);
@@ -190,6 +197,7 @@ public class ActivityShow extends ActionBarActivity {
         mButton_ImportanceMarker.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Update project importance and change the background icon
                 Log.d(TAG, "User changed project importance.");
                 if (mCurrentCompletion)
                     return;
@@ -210,6 +218,7 @@ public class ActivityShow extends ActionBarActivity {
         mButton_Done.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Finish a project, after this, the project can only be deleted
                 Log.d(TAG, "User clicked done button.");
                 if (mCurrentCompletion)
                     Log.d(TAG, "Completion state error!");
@@ -353,6 +362,8 @@ public class ActivityShow extends ActionBarActivity {
             return false;
         }
         if (id == R.id.action_share_project) {
+            // Create a file contains current project, and send it via Email
+            // This can be done only when a email account has been set up
             String fileName = mProjectManager.saveOneProject(mProjectID);
             if (fileName.length() != 0) {
                 Log.d(TAG, fileName + " has been exported and is being sent!");
@@ -390,6 +401,7 @@ public class ActivityShow extends ActionBarActivity {
     }
 
     public void onCheckTaskComplete(View view) {
+        // User finish a task, it cannot be edited/deleted any more
         CheckBox checkBox = (CheckBox) view;
         int position = (Integer) checkBox.getTag();
         Log.d(TAG, "User clicked check button at row " + position + ".");

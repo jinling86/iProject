@@ -6,9 +6,9 @@ import android.media.MediaPlayer;
 import android.os.IBinder;
 
 /**
- * This class is implemented for CSI5175 Assignment 3.
+ * This class is implemented for CSI5175 Bonus Assignment.
  * This class implements a music playing service. The service should be created when the app starts,
- * and destroyed when the app is switched out.
+ * destroyed when the app is switched out, and kept when switching between activities.
  *
  * @author Ling Jin
  * @version 1.0

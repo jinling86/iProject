@@ -21,7 +21,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * This class is implemented for CSI5175 Assignment 3.
+ * This class is implemented for CSI5175 Bonus Assignment.
  * This class shows project list to users. It also provides adding, editing, sorting and reporting
  * functions. It can start project edit Activity and project show Activity.
  * It starts the background music when startup.
@@ -78,11 +78,14 @@ public class ActivityList extends ActionBarActivity {
         mInSwitching = false;
         mProjectManager = new ProjectManager(this);
         sortProjects();
+        // Use a timer to update remaining time
         if (mTimer == null) {
             mTimer = new Timer();
         }
         populateFields();
         startService(new Intent(this, ServiceMusic.class));
+        // Use a static variable to indicate the first time launch of the activity
+        // Prompt the warning dialog when the activity starts for the first time
         if (mFirstLaunch) {
             mFirstLaunch = false;
             String report = mProjectManager.getWarning();
@@ -112,11 +115,13 @@ public class ActivityList extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
+        // Make the app disappear from the UI, avoid activity stack operation
         moveTaskToBack(true);
         finish();
     }
 
     private void populateFields() {
+        // Give a hint when there is no project in the system
         int projectNumber = mProjectManager.getProjectNumber();
         if (projectNumber != 0) {
             mView_ProjectHint.setVisibility(View.GONE);
@@ -129,6 +134,7 @@ public class ActivityList extends ActionBarActivity {
     }
 
     private void sortProjects() {
+        // Read the sort method in the system preference file, and sort
         int sortMethod = getPreferences(MODE_PRIVATE).getInt(SORT_PREFERENCE, SORT_BY_CREATED_TIME);
         if (sortMethod == SORT_BY_DUE_TIME)
             mProjectManager.setDateDescendingMap();
@@ -167,6 +173,7 @@ public class ActivityList extends ActionBarActivity {
     }
 
     private String getTaskDigest(String projectID) {
+        // Composite strings to be displayed
         StringBuilder builder = new StringBuilder();
         int taskNumber = mProjectManager.getTaskNumber(projectID);
         if (taskNumber != 0) {
@@ -193,6 +200,7 @@ public class ActivityList extends ActionBarActivity {
     }
 
     private String getTimeDigest(String projectID, String[] projectContents) {
+        // Composite strings to be displayed
         if (projectContents[ProjectManager.POS_COMPLETION].length() != 0) {
             StringBuilder builder = new StringBuilder();
             builder.append("Project has been completed");
@@ -246,6 +254,7 @@ public class ActivityList extends ActionBarActivity {
     }
 
     private String getCourseDigest(String[] projectContents) {
+        // Composite strings to be displayed
         StringBuilder builder = new StringBuilder();
         builder.append(projectContents[ProjectManager.POS_COURSE_NAME]);
         builder.append(", instructed by ");
@@ -254,6 +263,7 @@ public class ActivityList extends ActionBarActivity {
     }
 
     private int getTimeProgress(String[] projectContents) {
+        // Compute remaining time
         long currentTime = System.currentTimeMillis();
         Date startDate = Project.getDate(projectContents[ProjectManager.POS_START_DATE] + projectContents[ProjectManager.POS_START_TIME]);
         Date dueDate = Project.getDate(projectContents[ProjectManager.POS_DUE_DATE] + projectContents[ProjectManager.POS_DUE_TIME]);
@@ -268,6 +278,7 @@ public class ActivityList extends ActionBarActivity {
     }
 
     private int getTaskProgress(String projectID) {
+        // Compute remaining tasks
         int taskNumber = mProjectManager.getTaskNumber(projectID);
         int taskCompletion = 0;
         for (int i = 0; i < taskNumber; i++) {
@@ -298,6 +309,7 @@ public class ActivityList extends ActionBarActivity {
             return true;
         }
 
+        // Store sorting method to system preference
         if (id == R.id.action_sort_by_creation) {
             mProjectManager.setDefaultMap();
             populateFields();
@@ -362,6 +374,7 @@ public class ActivityList extends ActionBarActivity {
     private class ItemClickListener implements AdapterView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> arg0, View view, int position, long rowId) {
+            // Show details of a project
             mInSwitching = true;
             Intent intent = new Intent(getApplicationContext(), ActivityShow.class);
             intent.putExtra(ProjectManager.PROJECT_ID, mProjectManager.getIdByIndex(position));
@@ -371,12 +384,14 @@ public class ActivityList extends ActionBarActivity {
 
     class UpdateTimeTask extends TimerTask {
         public void run() {
+            // Do processing in activity thread, views cannot be modified in the timer thread!
             runOnUiThread(InternalTimeTask);
         }
     }
 
     private Runnable InternalTimeTask = new Runnable() {
         public void run() {
+            // Update the remaining time
             int projectNumber = mProjectManager.getProjectNumber();
             if (mListContent == null || mListAdapter == null)
                 return;
