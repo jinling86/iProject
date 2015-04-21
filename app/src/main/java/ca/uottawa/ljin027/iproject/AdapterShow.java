@@ -12,7 +12,12 @@ import android.widget.TextView;
 import java.util.List;
 
 /**
- * Created by ljin027 on 18/04/2015.
+ * This class is implemented for CSI5175 Assignment 3.
+ * This class defines the data structure used in the following array adapter.
+ *
+ * @author Ling Jin
+ * @version 1.0
+ * @since 19/04/2015
  */
 class ShowList {
     private String task;
@@ -70,6 +75,15 @@ class ShowList {
 
 }
 
+/**
+ * This class is implemented for CSI5175 Assignment 3.
+ * This class implements an adapter for populating the fields of the list view. The adapter supports
+ * the check box in the list view.
+ *
+ * @author Ling Jin
+ * @version 1.0
+ * @since 18/04/2015
+ */
 public class AdapterShow extends ArrayAdapter<ShowList> {
     private List<ShowList> mShowList;
     private Context mContext;
@@ -94,8 +108,8 @@ public class AdapterShow extends ArrayAdapter<ShowList> {
     public View getView(int position, View convertView, ViewGroup parent) {
         View aRow = convertView;
         ViewHolder viewHolder = new ViewHolder();
-        if(aRow == null) {
-            LayoutInflater inflater = ((Activity)mContext).getLayoutInflater();
+        if (aRow == null) {
+            LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
             aRow = inflater.inflate(R.layout.list_task_digest, null);
 
             viewHolder.name = (TextView) aRow.findViewById(R.id.showList_text_taskName);
@@ -108,9 +122,8 @@ public class AdapterShow extends ArrayAdapter<ShowList> {
             viewHolder.hint = (TextView) aRow.findViewById(R.id.showList_text_completionHint);
 
             aRow.setTag(viewHolder);
-        }
-        else {
-            viewHolder = (ViewHolder)convertView.getTag();
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
         ShowList listItem = mShowList.get(position);
@@ -119,11 +132,11 @@ public class AdapterShow extends ArrayAdapter<ShowList> {
         viewHolder.description.setText(listItem.getDescription());
         viewHolder.from.setText(listItem.getStartTime());
         viewHolder.to.setText(listItem.getDueDate());
-        if(listItem.isAllDone() || listItem.isCompleted()) {
+        if (listItem.isAllDone() || listItem.isCompleted()) {
             viewHolder.completed.setClickable(false);
         }
         viewHolder.completed.setChecked(listItem.isCompleted());
-        if(listItem.isCompleted())
+        if (listItem.isCompleted())
             viewHolder.hint.setText("Done");
         else
             viewHolder.hint.setText("Doing");

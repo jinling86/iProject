@@ -13,7 +13,12 @@ import android.widget.TextView;
 import java.util.List;
 
 /**
- * Created by ljin027 on 19/04/2015.
+ * This class is implemented for CSI5175 Assignment 3.
+ * This class defines the data structure used in the following array adapter.
+ *
+ * @author Ling Jin
+ * @version 1.0
+ * @since 19/04/2015
  */
 class ListList {
     private String projectName;
@@ -26,13 +31,13 @@ class ListList {
     private int taskProgress;
 
     public ListList(String name,
-            String courseDigest,
-            String taskDigest,
-            String timeDigest,
-            boolean completed,
-            boolean important,
-            int taskProgress,
-            int timeProgress) {
+                    String courseDigest,
+                    String taskDigest,
+                    String timeDigest,
+                    boolean completed,
+                    boolean important,
+                    int taskProgress,
+                    int timeProgress) {
         this.projectName = name;
         this.courseDigest = courseDigest;
         this.taskDigest = taskDigest;
@@ -80,6 +85,15 @@ class ListList {
     }
 }
 
+/**
+ * This class is implemented for CSI5175 Assignment 3.
+ * This class implements an adapter for populating the fields of the list view. The adapter provides
+ * supports for progress bars and image buttons in the list view.
+ *
+ * @author Ling Jin
+ * @version 1.0
+ * @since 19/04/2015
+ */
 public class AdapterList extends ArrayAdapter<ListList> {
     private List<ListList> mListList;
     private Context mContext;
@@ -105,8 +119,8 @@ public class AdapterList extends ArrayAdapter<ListList> {
     public View getView(int position, View convertView, ViewGroup parent) {
         View aRow = convertView;
         ViewHolder viewHolder = new ViewHolder();
-        if(aRow == null) {
-            LayoutInflater inflater = ((Activity)mContext).getLayoutInflater();
+        if (aRow == null) {
+            LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
             aRow = inflater.inflate(R.layout.list_project_digest, null);
 
             viewHolder.name = (TextView) aRow.findViewById(R.id.list_text_name);
@@ -119,9 +133,8 @@ public class AdapterList extends ArrayAdapter<ListList> {
             viewHolder.taskDomain = (ProgressBar) aRow.findViewById(R.id.list_progress_task);
 
             aRow.setTag(viewHolder);
-        }
-        else {
-            viewHolder = (ViewHolder)convertView.getTag();
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
         ListList listItem = mListList.get(position);
@@ -130,11 +143,11 @@ public class AdapterList extends ArrayAdapter<ListList> {
         viewHolder.course.setText(listItem.getCourseDigest());
         viewHolder.task.setText(listItem.getTaskDigest());
         viewHolder.remainder.setText(listItem.getTimeDigest());
-        if(listItem.isCompleted())
+        if (listItem.isCompleted())
             viewHolder.completion.setBackgroundResource(R.drawable.ic_done);
         else
             viewHolder.completion.setBackgroundResource(R.drawable.ic_doing);
-        if(listItem.isImportant())
+        if (listItem.isImportant())
             viewHolder.importance.setBackgroundResource(R.drawable.ic_important);
         else
             viewHolder.importance.setBackgroundResource(R.drawable.ic_unimportant);

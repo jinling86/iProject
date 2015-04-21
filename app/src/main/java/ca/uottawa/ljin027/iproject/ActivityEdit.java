@@ -16,7 +16,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
@@ -25,6 +24,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * This class is implemented for CSI5175 Assignment 3.
+ * This class supports the editing of a project. This includes modifying contents of the project,
+ * adding, deleting, modifying sub-tasks of the project, assuming the date and time is right in
+ * order to be used in the following comparison.
+ *
+ * @author Ling Jin
+ * @version 1.0
+ * @since 15/04/2015
+ */
 public class ActivityEdit extends ActionBarActivity {
     private static final String PROJECT_ID = "ID";
     private static final String PROJECT_TMP_ID = "TMP_ID";
@@ -65,7 +74,7 @@ public class ActivityEdit extends ActionBarActivity {
     private boolean mInSwitching = false;
 
     private int mEditingTaskIndex = DEFAULT_TASK_INDEX;
-    private String [] mEditingTaskContents;
+    private String[] mEditingTaskContents;
 
     private static final String TAG = "<<<< Activity Edit >>>>";
 
@@ -86,30 +95,28 @@ public class ActivityEdit extends ActionBarActivity {
         mNewProject = false;
         mTmpID = null;
         mProjectID = "";
-        if(savedInstanceState != null) {
+        if (savedInstanceState != null) {
             mProjectID = (String) savedInstanceState.getSerializable(PROJECT_ID);
             mTmpID = (String) savedInstanceState.getSerializable(PROJECT_TMP_ID);
             mNewProject = (Boolean) savedInstanceState.getSerializable(PROJECT_INDICATOR);
             mEditingTaskIndex = (Integer) savedInstanceState.getSerializable(TASK_STATE);
-            if(mEditingTaskIndex != DEFAULT_TASK_INDEX)
-                mEditingTaskContents = (String []) savedInstanceState.getSerializable(TASK_CONTENT);
+            if (mEditingTaskIndex != DEFAULT_TASK_INDEX)
+                mEditingTaskContents = (String[]) savedInstanceState.getSerializable(TASK_CONTENT);
 
             startService(new Intent(this, ServiceMusic.class));
-        }
-        else {
+        } else {
             Bundle extras = getIntent().getExtras();
             if (extras != null) {
                 mProjectID = extras.getString(ProjectManager.PROJECT_ID);
-            }
-            else {
+            } else {
                 mNewProject = true;
             }
         }
 
         mProjectManager = new ProjectManager(this);
-        if(mTmpID == null) {
+        if (mTmpID == null) {
             mTmpID = mProjectManager.addProject();
-            if(!mNewProject) {
+            if (!mNewProject) {
                 mProjectManager.copyProject(mProjectID, mTmpID);
             }
         }
@@ -125,42 +132,41 @@ public class ActivityEdit extends ActionBarActivity {
         mProjectManager.getProjectByID(mTmpID, projectContent);
         mView_ProjectName.setText(
                 projectContent[ProjectManager.POS_NAME].compareTo(DEFAULT_STRING) == 0 ?
-                NULL_STRING: projectContent[ProjectManager.POS_NAME]);
+                        NULL_STRING : projectContent[ProjectManager.POS_NAME]);
         mView_ProjectDescription.setText(
                 projectContent[ProjectManager.POS_DESCRIPTION].compareTo(DEFAULT_STRING) == 0 ?
-                NULL_STRING: projectContent[ProjectManager.POS_DESCRIPTION]);
+                        NULL_STRING : projectContent[ProjectManager.POS_DESCRIPTION]);
         mView_CourseName.setText(
                 projectContent[ProjectManager.POS_COURSE_NAME].compareTo(DEFAULT_STRING) == 0 ?
-                NULL_STRING: projectContent[ProjectManager.POS_COURSE_NAME]);
+                        NULL_STRING : projectContent[ProjectManager.POS_COURSE_NAME]);
         mView_CourseInstructor.setText(
                 projectContent[ProjectManager.POS_INSTRUCTOR].compareTo(DEFAULT_STRING) == 0 ?
-                NULL_STRING: projectContent[ProjectManager.POS_INSTRUCTOR]);
+                        NULL_STRING : projectContent[ProjectManager.POS_INSTRUCTOR]);
         mView_ProjectStartDate.setText(projectContent[ProjectManager.POS_START_DATE]);
         mView_ProjectStartTime.setText(projectContent[ProjectManager.POS_START_TIME]);
         mView_ProjectDueDate.setText(projectContent[ProjectManager.POS_DUE_DATE]);
         mView_ProjectDueTime.setText(projectContent[ProjectManager.POS_DUE_TIME]);
 
-        if(mEditingTaskIndex == DEFAULT_TASK_INDEX) {
+        if (mEditingTaskIndex == DEFAULT_TASK_INDEX) {
             mButton_AddTask.setVisibility(View.VISIBLE);
             mLayout_EditTask.setVisibility(View.GONE);
             int taskNumber = mProjectManager.getTaskNumber(mTmpID);
-            if(taskNumber != 0) {
+            if (taskNumber != 0) {
                 fillList(mList_UpperPart, 0, taskNumber);
                 fillList(mList_LowerPart, taskNumber, taskNumber);
             }
-        }
-        else {
+        } else {
             mButton_AddTask.setVisibility(View.GONE);
             String[] taskContent = mProjectManager.getTask(mTmpID, mEditingTaskIndex);
             mView_TaskName.setText(
                     taskContent[ProjectManager.POS_NAME].compareTo(DEFAULT_STRING) == 0 ?
-                    NULL_STRING: taskContent[ProjectManager.POS_NAME]);
+                            NULL_STRING : taskContent[ProjectManager.POS_NAME]);
             mView_TaskDescription.setText(
                     taskContent[ProjectManager.POS_DESCRIPTION].compareTo(DEFAULT_STRING) == 0 ?
-                    NULL_STRING: taskContent[ProjectManager.POS_DESCRIPTION]);
+                            NULL_STRING : taskContent[ProjectManager.POS_DESCRIPTION]);
             mView_TaskMembers.setText(
                     taskContent[ProjectManager.POS_MEMBERS].compareTo(DEFAULT_STRING) == 0 ?
-                    NULL_STRING: taskContent[ProjectManager.POS_MEMBERS]);
+                            NULL_STRING : taskContent[ProjectManager.POS_MEMBERS]);
             mView_TaskStartDate.setText(taskContent[ProjectManager.POS_START_DATE]);
             mView_TaskStartTime.setText(taskContent[ProjectManager.POS_START_TIME]);
             mView_TaskDueDate.setText(taskContent[ProjectManager.POS_DUE_DATE]);
@@ -185,18 +191,18 @@ public class ActivityEdit extends ActionBarActivity {
 
         List<HashMap<String, String>> taskList = new ArrayList<HashMap<String, String>>();
         for (int i = taskStart; i < taskEnd; i++) {
-            String [] taskContent = mProjectManager.getTask(mTmpID, i);
+            String[] taskContent = mProjectManager.getTask(mTmpID, i);
             HashMap<String, String> map = new HashMap<String, String>();
             map.put("name", taskContent[ProjectManager.POS_NAME]);
             map.put("description", taskContent[ProjectManager.POS_DESCRIPTION]);
             map.put("members", taskContent[ProjectManager.POS_MEMBERS]);
-            map.put("start", taskContent[ProjectManager.POS_START_DATE]+taskContent[ProjectManager.POS_START_TIME]);
-            map.put("end", taskContent[ProjectManager.POS_DUE_DATE]+taskContent[ProjectManager.POS_DUE_TIME]);
+            map.put("start", taskContent[ProjectManager.POS_START_DATE] + taskContent[ProjectManager.POS_START_TIME]);
+            map.put("end", taskContent[ProjectManager.POS_DUE_DATE] + taskContent[ProjectManager.POS_DUE_TIME]);
             taskList.add(map);
         }
 
         SimpleAdapter adapter = null;
-        if(mEditingTaskIndex == DEFAULT_TASK_INDEX)
+        if (mEditingTaskIndex == DEFAULT_TASK_INDEX)
             adapter = new SimpleAdapter(this, taskList, R.layout.list_task_edit, from, to);
         else
             adapter = new SimpleAdapter(this, taskList, R.layout.list_task_show, from, to);
@@ -224,14 +230,14 @@ public class ActivityEdit extends ActionBarActivity {
         String dueDate = mView_ProjectDueDate.getText().toString() + mView_ProjectDueTime.getText().toString();
         mProjectManager.setProject(
                 mTmpID,
-                projectName.length() == 0 ? DEFAULT_STRING: projectName,
-                projectDescription.length() == 0 ? DEFAULT_STRING: projectDescription,
-                instructor.length() == 0 ? DEFAULT_STRING: instructor,
-                courseName.length() == 0 ? DEFAULT_STRING: courseName,
+                projectName.length() == 0 ? DEFAULT_STRING : projectName,
+                projectDescription.length() == 0 ? DEFAULT_STRING : projectDescription,
+                instructor.length() == 0 ? DEFAULT_STRING : instructor,
+                courseName.length() == 0 ? DEFAULT_STRING : courseName,
                 startTime,
                 dueDate);
 
-        if(mEditingTaskIndex != DEFAULT_TASK_INDEX) {
+        if (mEditingTaskIndex != DEFAULT_TASK_INDEX) {
             String taskName = mView_TaskName.getText().toString();
             String taskDescription = mView_TaskDescription.getText().toString();
             String taskMembers = mView_TaskMembers.getText().toString();
@@ -240,9 +246,9 @@ public class ActivityEdit extends ActionBarActivity {
             mProjectManager.setTask(
                     mTmpID,
                     mEditingTaskIndex,
-                    taskName.length() == 0 ? DEFAULT_STRING: taskName,
-                    taskDescription.length() == 0 ? DEFAULT_STRING: taskDescription,
-                    taskMembers.length() == 0 ? DEFAULT_STRING: taskMembers,
+                    taskName.length() == 0 ? DEFAULT_STRING : taskName,
+                    taskDescription.length() == 0 ? DEFAULT_STRING : taskDescription,
+                    taskMembers.length() == 0 ? DEFAULT_STRING : taskMembers,
                     taskStartTime,
                     taskDueDate);
         }
@@ -284,7 +290,7 @@ public class ActivityEdit extends ActionBarActivity {
         mButton_AddTask.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mEditingTaskIndex == DEFAULT_TASK_INDEX) {
+                if (mEditingTaskIndex == DEFAULT_TASK_INDEX) {
                     update();
                     String startTime = mView_ProjectStartDate.getText().toString() + mView_ProjectStartTime.getText().toString();
                     String dueDate = mView_ProjectDueDate.getText().toString() + mView_ProjectDueTime.getText().toString();
@@ -300,13 +306,12 @@ public class ActivityEdit extends ActionBarActivity {
         button_DeleteTask.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mEditingTaskIndex != DEFAULT_TASK_INDEX) {
+                if (mEditingTaskIndex != DEFAULT_TASK_INDEX) {
                     mProjectManager.deleteTask(mTmpID, mEditingTaskIndex);
                     mEditingTaskIndex = DEFAULT_TASK_INDEX;
                     populateFields();
                     closeKeyboard();
-                }
-                else {
+                } else {
                     Log.d(TAG, "Internal state error!");
                 }
 
@@ -317,13 +322,12 @@ public class ActivityEdit extends ActionBarActivity {
         button_SaveTask.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mEditingTaskIndex != DEFAULT_TASK_INDEX) {
+                if (mEditingTaskIndex != DEFAULT_TASK_INDEX) {
                     update();
                     mEditingTaskIndex = DEFAULT_TASK_INDEX;
                     populateFields();
                     closeKeyboard();
-                }
-                else {
+                } else {
                     Log.d(TAG, "Internal state error!");
                 }
             }
@@ -333,7 +337,7 @@ public class ActivityEdit extends ActionBarActivity {
         button_CancelTask.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mEditingTaskIndex != DEFAULT_TASK_INDEX) {
+                if (mEditingTaskIndex != DEFAULT_TASK_INDEX) {
                     mProjectManager.setTask(
                             mTmpID,
                             mEditingTaskIndex,
@@ -343,8 +347,7 @@ public class ActivityEdit extends ActionBarActivity {
                             mEditingTaskContents[ProjectManager.POS_START_DATE] + mEditingTaskContents[ProjectManager.POS_START_TIME],
                             mEditingTaskContents[ProjectManager.POS_DUE_DATE] + mEditingTaskContents[ProjectManager.POS_DUE_TIME]);
                     populateFields();
-                }
-                else {
+                } else {
                     Log.d(TAG, "Internal state error!");
                 }
             }
@@ -357,7 +360,7 @@ public class ActivityEdit extends ActionBarActivity {
                 mProjectManager.deleteProject(mTmpID);
                 mTmpID = null;
                 mInSwitching = true;
-                if(!mNewProject) {
+                if (!mNewProject) {
                     mProjectManager.deleteProject(mProjectID);
                 }
                 startActivity(new Intent(getApplicationContext(), ActivityList.class));
@@ -366,10 +369,10 @@ public class ActivityEdit extends ActionBarActivity {
     }
 
     public void onButtonEditTaskClick(View view) {
-        if(mEditingTaskIndex == DEFAULT_TASK_INDEX) {
+        if (mEditingTaskIndex == DEFAULT_TASK_INDEX) {
             mEditingTaskIndex = mList_UpperPart.getPositionForView((View) view.getParent());
             mEditingTaskContents = mProjectManager.getTask(mTmpID, mEditingTaskIndex);
-            if(mEditingTaskContents[ProjectManager.POS_COMPLETION].length() == 0)
+            if (mEditingTaskContents[ProjectManager.POS_COMPLETION].length() == 0)
                 populateFields();
             else {
                 mEditingTaskIndex = DEFAULT_TASK_INDEX;
@@ -381,13 +384,13 @@ public class ActivityEdit extends ActionBarActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(mTmpID != null) {
+        if (mTmpID != null) {
             update();
             outState.putSerializable(PROJECT_ID, mProjectID);
             outState.putSerializable(PROJECT_TMP_ID, mTmpID);
             outState.putSerializable(PROJECT_INDICATOR, mNewProject);
             outState.putSerializable(TASK_STATE, mEditingTaskIndex);
-            if(mEditingTaskIndex != DEFAULT_TASK_INDEX)
+            if (mEditingTaskIndex != DEFAULT_TASK_INDEX)
                 outState.putSerializable(TASK_CONTENT, mEditingTaskContents);
         }
     }
@@ -403,15 +406,14 @@ public class ActivityEdit extends ActionBarActivity {
         int id = item.getItemId();
         if (id == R.id.action_save_project) {
             update();
-            if(mNewProject) {
+            if (mNewProject) {
                 Intent intent = new Intent(this, ActivityShow.class);
                 intent.putExtra(ProjectManager.PROJECT_ID, mTmpID);
                 mTmpID = null;
                 mInSwitching = true;
                 startActivity(intent);
                 finish();
-            }
-            else {
+            } else {
                 mProjectManager.destroyTmpProject(mTmpID, mProjectID);
                 mTmpID = null;
                 mInSwitching = true;
@@ -428,13 +430,12 @@ public class ActivityEdit extends ActionBarActivity {
 
     @Override
     public Intent getSupportParentActivityIntent() {
-        if(mNewProject) {
+        if (mNewProject) {
             mProjectManager.deleteProject(mTmpID);
             mTmpID = null;
             mInSwitching = true;
             return new Intent(this, ActivityList.class);
-        }
-        else {
+        } else {
             Intent intent = new Intent(this, ActivityShow.class);
             intent.putExtra(ProjectManager.PROJECT_ID, mProjectID);
             mProjectManager.deleteProject(mTmpID);
@@ -459,17 +460,18 @@ public class ActivityEdit extends ActionBarActivity {
 
     @Override
     protected void onStop() {
-        if(mTmpID != null) {
+        if (mTmpID != null) {
             Log.d(TAG, "Activity switched out, discard changes");
             mProjectManager.deleteProject(mTmpID);
         }
-        if(!mInSwitching)
+        if (!mInSwitching)
             stopService(new Intent(this, ServiceMusic.class));
         super.onStop();
     }
 
     private class TimeSetter implements View.OnClickListener {
         private EditText mEditText;
+
         public TimeSetter(EditText editText) {
             mEditText = editText;
         }
@@ -477,7 +479,7 @@ public class ActivityEdit extends ActionBarActivity {
         @Override
         public void onClick(View v) {
             FragmentPicker newFragment = new FragmentPicker();
-            if(mEditText == mView_ProjectDueTime) {
+            if (mEditText == mView_ProjectDueTime) {
                 // Trying to modify due time
                 newFragment.setListener(
                         mEditText,
@@ -487,8 +489,7 @@ public class ActivityEdit extends ActionBarActivity {
                         getProjectDueLowerBound(),
                         null,
                         null);
-            }
-            else if(mEditText == mView_ProjectStartTime){
+            } else if (mEditText == mView_ProjectStartTime) {
                 // Trying to modify start time
                 newFragment.setListener(
                         mEditText,
@@ -498,8 +499,7 @@ public class ActivityEdit extends ActionBarActivity {
                         getProjectStartLowerBound(),
                         mView_ProjectDueDate,
                         mView_ProjectDueTime);
-            }
-            else if(mEditText == mView_TaskDueTime){
+            } else if (mEditText == mView_TaskDueTime) {
                 // Trying to modify start time
                 newFragment.setListener(
                         mEditText,
@@ -509,8 +509,7 @@ public class ActivityEdit extends ActionBarActivity {
                         getTaskDueLowerBound(),
                         null,
                         null);
-            }
-            else if(mEditText == mView_TaskStartTime){
+            } else if (mEditText == mView_TaskStartTime) {
                 // Trying to modify start time
                 newFragment.setListener(
                         mEditText,
@@ -527,6 +526,7 @@ public class ActivityEdit extends ActionBarActivity {
 
     private class DateSetter implements View.OnClickListener {
         private EditText mEditText;
+
         public DateSetter(EditText editText) {
             mEditText = editText;
         }
@@ -534,7 +534,7 @@ public class ActivityEdit extends ActionBarActivity {
         @Override
         public void onClick(View v) {
             FragmentPicker newFragment = new FragmentPicker();
-            if(mEditText == mView_ProjectDueDate) {
+            if (mEditText == mView_ProjectDueDate) {
                 // Trying to modify due time
                 newFragment.setListener(
                         mEditText,
@@ -544,8 +544,7 @@ public class ActivityEdit extends ActionBarActivity {
                         getProjectDueLowerBound(),
                         null,
                         null);
-            }
-            else if(mEditText == mView_ProjectStartDate){
+            } else if (mEditText == mView_ProjectStartDate) {
                 // Trying to modify start time
                 newFragment.setListener(
                         mEditText,
@@ -555,8 +554,7 @@ public class ActivityEdit extends ActionBarActivity {
                         getProjectStartLowerBound(),
                         mView_ProjectDueDate,
                         mView_ProjectDueTime);
-            }
-            else if(mEditText == mView_TaskDueDate){
+            } else if (mEditText == mView_TaskDueDate) {
                 // Trying to modify start time
                 newFragment.setListener(
                         mEditText,
@@ -566,8 +564,7 @@ public class ActivityEdit extends ActionBarActivity {
                         getTaskDueLowerBound(),
                         null,
                         null);
-            }
-            else if(mEditText == mView_TaskStartDate){
+            } else if (mEditText == mView_TaskStartDate) {
                 // Trying to modify start time
                 newFragment.setListener(
                         mEditText,
@@ -585,12 +582,12 @@ public class ActivityEdit extends ActionBarActivity {
     private Date getEarliestTaskStartTime() {
         Date earliest = null;
         int taskNumber = mProjectManager.getTaskNumber(mTmpID);
-        for(int i = 0; i < taskNumber; i++) {
-            String [] task = mProjectManager.getTask(mTmpID, i);
-            Date startTime = Project.getDate(task[ProjectManager.POS_START_DATE]+task[ProjectManager.POS_START_TIME]);
-            if(earliest == null)
+        for (int i = 0; i < taskNumber; i++) {
+            String[] task = mProjectManager.getTask(mTmpID, i);
+            Date startTime = Project.getDate(task[ProjectManager.POS_START_DATE] + task[ProjectManager.POS_START_TIME]);
+            if (earliest == null)
                 earliest = startTime;
-            else if(earliest.after(startTime))
+            else if (earliest.after(startTime))
                 earliest = startTime;
         }
         return earliest;
@@ -599,76 +596,74 @@ public class ActivityEdit extends ActionBarActivity {
     private Date getLatestTaskDueTime() {
         Date latest = null;
         int taskNumber = mProjectManager.getTaskNumber(mTmpID);
-        for(int i = 0; i < taskNumber; i++) {
-            String [] task = mProjectManager.getTask(mTmpID, i);
-            Date dueDate = Project.getDate(task[ProjectManager.POS_DUE_DATE]+task[ProjectManager.POS_DUE_TIME]);
-            if(latest == null)
+        for (int i = 0; i < taskNumber; i++) {
+            String[] task = mProjectManager.getTask(mTmpID, i);
+            Date dueDate = Project.getDate(task[ProjectManager.POS_DUE_DATE] + task[ProjectManager.POS_DUE_TIME]);
+            if (latest == null)
                 latest = dueDate;
-            else if(latest.before(dueDate))
+            else if (latest.before(dueDate))
                 latest = dueDate;
         }
         return latest;
     }
 
     private Date getProjectStartUpperBound() {
-        Date upperBound = new Date(2020-1900, 1, 1, 0, 0);
+        Date upperBound = new Date(2020 - 1900, 1, 1, 0, 0);
         Date taskBound = getEarliestTaskStartTime();
-        if(taskBound != null && taskBound.before(upperBound)) {
+        if (taskBound != null && taskBound.before(upperBound)) {
             return taskBound;
-        }
-        else {
+        } else {
             return upperBound;
         }
     }
 
     private Date getProjectStartLowerBound() {
-        return new Date(2010-1900, 1, 1, 0, 0);
+        return new Date(2010 - 1900, 1, 1, 0, 0);
     }
 
     private Date getProjectDueUpperBound() {
-        return new Date(2020-1900, 1, 1, 0, 0);
+        return new Date(2020 - 1900, 1, 1, 0, 0);
     }
 
     private Date getProjectDueLowerBound() {
         Date lowerBound = Project.getDate(
-                mView_ProjectStartDate.getText().toString()+ mView_ProjectStartTime.getText().toString());
+                mView_ProjectStartDate.getText().toString() + mView_ProjectStartTime.getText().toString());
         Date taskBound = getLatestTaskDueTime();
-        if(taskBound != null && taskBound.after(lowerBound)) {
+        if (taskBound != null && taskBound.after(lowerBound)) {
             return taskBound;
-        }
-        else {
+        } else {
             return lowerBound;
         }
     }
 
     private Date getTaskStartUpperBound() {
         Date upperBound = Project.getDate(
-                mView_ProjectDueDate.getText().toString()+ mView_ProjectDueTime.getText().toString());
+                mView_ProjectDueDate.getText().toString() + mView_ProjectDueTime.getText().toString());
         return upperBound;
     }
 
     private Date getTaskStartLowerBound() {
         Date lowerBound = Project.getDate(
-                mView_ProjectStartDate.getText().toString()+ mView_ProjectStartTime.getText().toString());
+                mView_ProjectStartDate.getText().toString() + mView_ProjectStartTime.getText().toString());
         return lowerBound;
     }
 
     private Date getTaskDueUpperBound() {
         Date upperBound = Project.getDate(
-                mView_ProjectDueDate.getText().toString()+ mView_ProjectDueTime.getText().toString());
+                mView_ProjectDueDate.getText().toString() + mView_ProjectDueTime.getText().toString());
         return upperBound;
     }
 
     private Date getTaskDueLowerBound() {
         Date lowerBound = Project.getDate(
-                mView_TaskStartDate.getText().toString()+ mView_TaskStartTime.getText().toString());
+                mView_TaskStartDate.getText().toString() + mView_TaskStartTime.getText().toString());
         return lowerBound;
     }
 
     private void closeKeyboard() {
         InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         View view = getCurrentFocus();
-        if(view != null) {
+        if (view != null) {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }

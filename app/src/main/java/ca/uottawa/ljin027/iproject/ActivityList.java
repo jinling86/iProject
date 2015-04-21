@@ -20,6 +20,16 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * This class is implemented for CSI5175 Assignment 3.
+ * This class shows project list to users. It also provides adding, editing, sorting and reporting
+ * functions. It can start project edit Activity and project show Activity.
+ * It starts the background music when startup.
+ *
+ * @author Ling Jin
+ * @version 1.0
+ * @since 15/04/2015
+ */
 public class ActivityList extends ActionBarActivity {
 
     private ProjectManager mProjectManager = null;
@@ -47,7 +57,7 @@ public class ActivityList extends ActionBarActivity {
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);
         actionBar.setIcon(R.drawable.ic_icon);
 
-        if(mTimer == null) {
+        if (mTimer == null) {
             mTimer = new Timer();
         }
 
@@ -57,8 +67,8 @@ public class ActivityList extends ActionBarActivity {
     }
 
     private void linkViews() {
-        mView_ProjectList = (ListView)findViewById(R.id.list_project);
-        mView_ProjectHint = (TextView)findViewById(R.id.text_hint);
+        mView_ProjectList = (ListView) findViewById(R.id.list_project);
+        mView_ProjectHint = (TextView) findViewById(R.id.text_hint);
         mView_ProjectList.setOnItemClickListener(new ItemClickListener());
     }
 
@@ -68,15 +78,15 @@ public class ActivityList extends ActionBarActivity {
         mInSwitching = false;
         mProjectManager = new ProjectManager(this);
         sortProjects();
-        if(mTimer == null) {
+        if (mTimer == null) {
             mTimer = new Timer();
         }
         populateFields();
         startService(new Intent(this, ServiceMusic.class));
-        if(mFirstLaunch) {
+        if (mFirstLaunch) {
             mFirstLaunch = false;
             String report = mProjectManager.getWarning();
-            if(report.compareTo(ProjectManager.NO_WARNING) != 0) {
+            if (report.compareTo(ProjectManager.NO_WARNING) != 0) {
                 DialogReport reportDialog = new DialogReport();
                 reportDialog.setContent(report, R.color.dialog_warn_text);
                 reportDialog.show(getFragmentManager(), null);
@@ -86,9 +96,9 @@ public class ActivityList extends ActionBarActivity {
 
     @Override
     public void onStop() {
-        if(!mInSwitching)
+        if (!mInSwitching)
             stopService(new Intent(this, ServiceMusic.class));
-        if(mTimer != null) {
+        if (mTimer != null) {
             mTimer.cancel();
             mTimer = null;
         }
@@ -108,7 +118,7 @@ public class ActivityList extends ActionBarActivity {
 
     private void populateFields() {
         int projectNumber = mProjectManager.getProjectNumber();
-        if(projectNumber != 0) {
+        if (projectNumber != 0) {
             mView_ProjectHint.setVisibility(View.GONE);
             mView_ProjectList.setVisibility(View.VISIBLE);
             fillList();
@@ -120,9 +130,9 @@ public class ActivityList extends ActionBarActivity {
 
     private void sortProjects() {
         int sortMethod = getPreferences(MODE_PRIVATE).getInt(SORT_PREFERENCE, SORT_BY_CREATED_TIME);
-        if(sortMethod == SORT_BY_DUE_TIME)
+        if (sortMethod == SORT_BY_DUE_TIME)
             mProjectManager.setDateDescendingMap();
-        else if(sortMethod == SORT_BY_IMPORTANCE)
+        else if (sortMethod == SORT_BY_IMPORTANCE)
             mProjectManager.setPriorityMap();
         else
             mProjectManager.setDefaultMap();
@@ -133,8 +143,8 @@ public class ActivityList extends ActionBarActivity {
 
         int projectNumber = mProjectManager.getProjectNumber();
         mListContent = new ArrayList<ListList>();
-        for(int i = 0; i < projectNumber; i++) {
-            String [] projectContent = new String[ProjectManager.POS_MAX];
+        for (int i = 0; i < projectNumber; i++) {
+            String[] projectContent = new String[ProjectManager.POS_MAX];
             mProjectManager.getProjectByIndex(i, projectContent);
             String projectID = mProjectManager.getIdByIndex(i);
 
@@ -159,80 +169,72 @@ public class ActivityList extends ActionBarActivity {
     private String getTaskDigest(String projectID) {
         StringBuilder builder = new StringBuilder();
         int taskNumber = mProjectManager.getTaskNumber(projectID);
-        if(taskNumber != 0) {
+        if (taskNumber != 0) {
             int taskCompletion = 0;
-            for(int i = 0; i < taskNumber; i++) {
-                String [] contents = mProjectManager.getTask(projectID, i);
-                if(contents[ProjectManager.POS_COMPLETION].length() != 0)
+            for (int i = 0; i < taskNumber; i++) {
+                String[] contents = mProjectManager.getTask(projectID, i);
+                if (contents[ProjectManager.POS_COMPLETION].length() != 0)
                     taskCompletion++;
             }
-            if(taskCompletion <= 1) {
+            if (taskCompletion <= 1) {
                 builder.append(taskCompletion);
                 builder.append(" task has been completed, ");
-            }
-            else {
+            } else {
                 builder.append(taskCompletion);
                 builder.append(" tasks has been completed, ");
             }
 
             builder.append(taskNumber - taskCompletion);
             builder.append(" left");
-        }
-        else {
+        } else {
             builder.append("Project does not contain sub-tasks");
         }
         return builder.toString();
     }
 
-    private String getTimeDigest(String projectID, String [] projectContents) {
-        if(projectContents[ProjectManager.POS_COMPLETION].length() != 0) {
+    private String getTimeDigest(String projectID, String[] projectContents) {
+        if (projectContents[ProjectManager.POS_COMPLETION].length() != 0) {
             StringBuilder builder = new StringBuilder();
             builder.append("Project has been completed");
             return builder.toString();
-        }
-        else {
+        } else {
             StringBuilder builder = new StringBuilder();
             long currentTime = System.currentTimeMillis();
-            Date dueDate = Project.getDate(projectContents[ProjectManager.POS_DUE_DATE]+projectContents[ProjectManager.POS_DUE_TIME]);
+            Date dueDate = Project.getDate(projectContents[ProjectManager.POS_DUE_DATE] + projectContents[ProjectManager.POS_DUE_TIME]);
             long dueTime = dueDate.getTime();
-            if(dueTime <= currentTime) {
+            if (dueTime <= currentTime) {
                 builder.append("Time exceeded");
-            }
-            else {
+            } else {
                 long offset = (dueTime - currentTime) / 1000;
                 long offsetSecond = offset % 60;
                 long offsetMinute = (offset / 60) % 60;
-                long offsetHour = (offset / (60*60)) % 24;
-                long offsetDay = offset / (60*60*24);
-                if(offsetDay <= 1) {
+                long offsetHour = (offset / (60 * 60)) % 24;
+                long offsetDay = offset / (60 * 60 * 24);
+                if (offsetDay <= 1) {
                     builder.append(offsetDay);
                     builder.append(" day, ");
-                }
-                else {
+                } else {
                     builder.append(offsetDay);
                     builder.append(" days, ");
                 }
-                if(offsetHour <= 1) {
+                if (offsetHour <= 1) {
                     builder.append(offsetHour);
                     builder.append(" hour, ");
-                }
-                else {
+                } else {
                     builder.append(offsetHour);
                     builder.append(" hours, ");
                 }
-                if(offsetMinute <= 1) {
+                if (offsetMinute <= 1) {
                     builder.append(offsetMinute);
                     builder.append(" minute, ");
-                }
-                else {
+                } else {
                     builder.append(offsetMinute);
                     builder.append(" minutes, ");
                 }
-                if(offsetSecond <= 1) {
+                if (offsetSecond <= 1) {
                     builder.append(offsetSecond);
                     builder.append(" second, left");
-                }
-                else {
+                } else {
                     builder.append(offsetSecond);
                     builder.append(" seconds left");
                 }
@@ -243,7 +245,7 @@ public class ActivityList extends ActionBarActivity {
         }
     }
 
-    private String getCourseDigest(String [] projectContents) {
+    private String getCourseDigest(String[] projectContents) {
         StringBuilder builder = new StringBuilder();
         builder.append(projectContents[ProjectManager.POS_COURSE_NAME]);
         builder.append(", instructed by ");
@@ -251,15 +253,15 @@ public class ActivityList extends ActionBarActivity {
         return builder.toString();
     }
 
-    private int getTimeProgress(String [] projectContents) {
+    private int getTimeProgress(String[] projectContents) {
         long currentTime = System.currentTimeMillis();
-        Date startDate = Project.getDate(projectContents[ProjectManager.POS_START_DATE]+projectContents[ProjectManager.POS_START_TIME]);
-        Date dueDate = Project.getDate(projectContents[ProjectManager.POS_DUE_DATE]+projectContents[ProjectManager.POS_DUE_TIME]);
+        Date startDate = Project.getDate(projectContents[ProjectManager.POS_START_DATE] + projectContents[ProjectManager.POS_START_TIME]);
+        Date dueDate = Project.getDate(projectContents[ProjectManager.POS_DUE_DATE] + projectContents[ProjectManager.POS_DUE_TIME]);
         long startTime = startDate.getTime();
         long dueTime = dueDate.getTime();
-        if(dueTime > currentTime && startTime < currentTime)
-            return (int)(100 * (currentTime - startTime) / (dueTime - startTime));
-        else if(currentTime > dueTime)
+        if (dueTime > currentTime && startTime < currentTime)
+            return (int) (100 * (currentTime - startTime) / (dueTime - startTime));
+        else if (currentTime > dueTime)
             return 100;
         else
             return 0;
@@ -268,15 +270,15 @@ public class ActivityList extends ActionBarActivity {
     private int getTaskProgress(String projectID) {
         int taskNumber = mProjectManager.getTaskNumber(projectID);
         int taskCompletion = 0;
-        for(int i = 0; i < taskNumber; i++) {
-            String [] contents = mProjectManager.getTask(projectID, i);
-            if(contents[ProjectManager.POS_COMPLETION].length() != 0)
+        for (int i = 0; i < taskNumber; i++) {
+            String[] contents = mProjectManager.getTask(projectID, i);
+            if (contents[ProjectManager.POS_COMPLETION].length() != 0)
                 taskCompletion++;
         }
-        if(taskNumber == 0)
+        if (taskNumber == 0)
             return 100;
         else
-            return 100*taskCompletion/taskNumber;
+            return 100 * taskCompletion / taskNumber;
     }
 
     @Override
@@ -376,14 +378,14 @@ public class ActivityList extends ActionBarActivity {
     private Runnable InternalTimeTask = new Runnable() {
         public void run() {
             int projectNumber = mProjectManager.getProjectNumber();
-            if(mListContent == null || mListAdapter == null)
+            if (mListContent == null || mListAdapter == null)
                 return;
-            if(mListContent.size() != projectNumber) {
+            if (mListContent.size() != projectNumber) {
                 Log.d(TAG, "Timer state error!");
                 return;
             }
-            for(int i = 0; i < projectNumber; i++) {
-                String [] projectContent = new String[ProjectManager.POS_MAX];
+            for (int i = 0; i < projectNumber; i++) {
+                String[] projectContent = new String[ProjectManager.POS_MAX];
                 mProjectManager.getProjectByIndex(i, projectContent);
                 String projectID = mProjectManager.getIdByIndex(i);
                 mListContent.get(i).setTimeDigest(getTimeDigest(projectID, projectContent));

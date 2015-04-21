@@ -28,6 +28,21 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Date;
 
+/**
+ * This class is implemented for CSI5175 Assignment 3.
+ * This class displays the detail information of a project in the UI. It also computes the remaining
+ * time and tasks of the project.
+ * The project and sub-tasks can be marked as done in this activity. After marking as done, the
+ * project/sub-task cannot be further edit. But the completed project can be deleted.
+ * This activity supports the project sharing functions. It can generate an ipj(iProject) file and
+ * invoke mail apps to send it out. It can also read and import the ipj file from external storage.
+ * The newly imported file has a newly assigned internal name, so a file can be imported for
+ * multiple times.
+ *
+ * @author Ling Jin
+ * @version 1.0
+ * @since 15/04/2015
+ */
 public class ActivityShow extends ActionBarActivity {
     private static final String PROJECT_ID = "ID";
     private static final String PROJECT_CONTENT = "CONTENT";
@@ -36,7 +51,7 @@ public class ActivityShow extends ActionBarActivity {
 
     private ProjectManager mProjectManager;
     private String mProjectID;
-    private String [] mProjectContents;
+    private String[] mProjectContents;
     private boolean mInSwitching;
     private boolean mCurrentImportance;
     private boolean mCurrentCompletion;
@@ -67,8 +82,7 @@ public class ActivityShow extends ActionBarActivity {
         int rotation = getWindow().getWindowManager().getDefaultDisplay().getRotation();
         if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
             setContentView(R.layout.activity_show_landscape);
-        }
-        else {
+        } else {
             setContentView(R.layout.activity_show);
         }
 
@@ -80,9 +94,9 @@ public class ActivityShow extends ActionBarActivity {
 
         linkViews();
         mProjectManager = new ProjectManager(this);
-        if(savedInstanceState != null) {
+        if (savedInstanceState != null) {
             mProjectID = (String) savedInstanceState.getSerializable(PROJECT_ID);
-            mProjectContents = (String []) savedInstanceState.getSerializable(PROJECT_CONTENT);
+            mProjectContents = (String[]) savedInstanceState.getSerializable(PROJECT_CONTENT);
             mCurrentCompletion = (Boolean) savedInstanceState.getSerializable(PROJECT_COMPLETION);
             mCurrentImportance = (Boolean) savedInstanceState.getSerializable(PROJECT_IMPORTANCE);
 
@@ -91,19 +105,18 @@ public class ActivityShow extends ActionBarActivity {
             Bundle extras = getIntent().getExtras();
             if (extras != null) {
                 mProjectID = extras.getString(ProjectManager.PROJECT_ID);
-            }
-            else {
+            } else {
                 Log.d(TAG, "Activity receives no extra!");
             }
             mProjectContents = new String[ProjectManager.POS_MAX];
             mProjectManager.getProjectByID(mProjectID, mProjectContents);
         }
 
-        if(mProjectContents[ProjectManager.POS_IMPORTANCE].length() == 0)
+        if (mProjectContents[ProjectManager.POS_IMPORTANCE].length() == 0)
             mCurrentImportance = false;
         else
             mCurrentImportance = true;
-        if(mProjectContents[ProjectManager.POS_COMPLETION].length() == 0)
+        if (mProjectContents[ProjectManager.POS_COMPLETION].length() == 0)
             mCurrentCompletion = false;
         else
             mCurrentCompletion = true;
@@ -119,16 +132,16 @@ public class ActivityShow extends ActionBarActivity {
 
     void readExternalFile() {
         Uri data = getIntent().getData();
-        if(data != null) {
+        if (data != null) {
             Log.d(TAG, "Parsing external file.");
-            if(ContentResolver.SCHEME_CONTENT.equals(data.getScheme())) {
+            if (ContentResolver.SCHEME_CONTENT.equals(data.getScheme())) {
                 try {
                     ContentResolver resolver = getContentResolver();
                     InputStream is = resolver.openInputStream(data);
-                    if(is != null) {
+                    if (is != null) {
                         ObjectInputStream ois = new ObjectInputStream(is);
                         Project project = (Project) ois.readObject();
-                        if(project != null) {
+                        if (project != null) {
                             mProjectManager = new ProjectManager(this);
                             mProjectID = mProjectManager.addProjectFromExternal(project);
                             Log.d(TAG, "Parsing external successfully.");
@@ -136,8 +149,7 @@ public class ActivityShow extends ActionBarActivity {
                             return;
                         }
                     }
-                }
-                catch (ClassNotFoundException | IOException e) {
+                } catch (ClassNotFoundException | IOException e) {
                     Log.d(TAG, e.getMessage());
                 }
             }
@@ -152,8 +164,7 @@ public class ActivityShow extends ActionBarActivity {
         int rotation = getWindow().getWindowManager().getDefaultDisplay().getRotation();
         if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
             setContentView(R.layout.activity_show_landscape);
-        }
-        else {
+        } else {
             setContentView(R.layout.activity_show);
         }
         linkViews();
@@ -161,35 +172,35 @@ public class ActivityShow extends ActionBarActivity {
     }
 
     private void linkViews() {
-        mText_ProjectName = (TextView)findViewById(R.id.show_text_name);
-        mText_CourseName = (TextView)findViewById(R.id.show_text_courseName);
-        mText_CourseInstructor = (TextView)findViewById(R.id.show_text_instructor);
-        mText_ProjectStartTime = (TextView)findViewById(R.id.show_text_projectStartTime);
-        mText_ProjectDueDate = (TextView)findViewById(R.id.show_text_projectDueDate);
-        mText_ProjectDescription = (TextView)findViewById(R.id.show_text_description);
+        mText_ProjectName = (TextView) findViewById(R.id.show_text_name);
+        mText_CourseName = (TextView) findViewById(R.id.show_text_courseName);
+        mText_CourseInstructor = (TextView) findViewById(R.id.show_text_instructor);
+        mText_ProjectStartTime = (TextView) findViewById(R.id.show_text_projectStartTime);
+        mText_ProjectDueDate = (TextView) findViewById(R.id.show_text_projectDueDate);
+        mText_ProjectDescription = (TextView) findViewById(R.id.show_text_description);
 
-        mBar_TimeProgress = (ProgressBar)findViewById(R.id.show_progress_timeProgress);
-        mBar_TaskProgress = (ProgressBar)findViewById(R.id.show_progress_taskProgress);
+        mBar_TimeProgress = (ProgressBar) findViewById(R.id.show_progress_timeProgress);
+        mBar_TaskProgress = (ProgressBar) findViewById(R.id.show_progress_taskProgress);
 
-        mList = (ListView)findViewById(R.id.show_list_task);
-        mButton_ImportanceMarker = (ImageButton)findViewById(R.id.show_button_importanceMarker);
-        mButton_Done = (Button)findViewById(R.id.show_button_done);
-        mButton_Delete = (Button)findViewById(R.id.show_button_delete);
+        mList = (ListView) findViewById(R.id.show_list_task);
+        mButton_ImportanceMarker = (ImageButton) findViewById(R.id.show_button_importanceMarker);
+        mButton_Done = (Button) findViewById(R.id.show_button_done);
+        mButton_Delete = (Button) findViewById(R.id.show_button_delete);
 
         mButton_ImportanceMarker.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "User changed project importance.");
-                if(mCurrentCompletion)
+                if (mCurrentCompletion)
                     return;
                 mCurrentImportance = !mCurrentImportance;
 
-                if(mCurrentImportance)
+                if (mCurrentImportance)
                     mProjectManager.setProjectState(mProjectID, Project.IMPORTANT, mCurrentCompletion);
                 else
                     mProjectManager.setProjectState(mProjectID, Project.UNIMPORTANT, mCurrentCompletion);
 
-                if(mCurrentImportance)
+                if (mCurrentImportance)
                     mButton_ImportanceMarker.setBackgroundResource(R.drawable.ic_important);
                 else
                     mButton_ImportanceMarker.setBackgroundResource(R.drawable.ic_unimportant);
@@ -200,11 +211,11 @@ public class ActivityShow extends ActionBarActivity {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "User clicked done button.");
-                if(mCurrentCompletion)
+                if (mCurrentCompletion)
                     Log.d(TAG, "Completion state error!");
 
-                if(mCurrentCompletedTasks != mCurrentTaskNumber) {
-                    for(int i = 0; i < mCurrentTaskNumber; i++) {
+                if (mCurrentCompletedTasks != mCurrentTaskNumber) {
+                    for (int i = 0; i < mCurrentTaskNumber; i++) {
                         mProjectManager.setTaskState(mProjectID, i, true);
                     }
                 }
@@ -213,7 +224,7 @@ public class ActivityShow extends ActionBarActivity {
                 populateFields();
                 mProjectManager.setProjectState(
                         mProjectID,
-                        mCurrentImportance ? Project.IMPORTANT: Project.UNIMPORTANT,
+                        mCurrentImportance ? Project.IMPORTANT : Project.UNIMPORTANT,
                         mCurrentCompletion);
             }
         });
@@ -240,15 +251,14 @@ public class ActivityShow extends ActionBarActivity {
                 mProjectContents[ProjectManager.POS_DUE_DATE] + mProjectContents[ProjectManager.POS_DUE_TIME]);
         mText_ProjectDescription.setText(mProjectContents[ProjectManager.POS_DESCRIPTION]);
 
-        if(mCurrentImportance)
+        if (mCurrentImportance)
             mButton_ImportanceMarker.setBackgroundResource(R.drawable.ic_important);
         else
             mButton_ImportanceMarker.setBackgroundResource(R.drawable.ic_unimportant);
-        if(mCurrentCompletion) {
+        if (mCurrentCompletion) {
             mButton_Done.setVisibility(View.INVISIBLE);
             mButton_Delete.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             mButton_Done.setVisibility(View.VISIBLE);
             mButton_Delete.setVisibility(View.INVISIBLE);
         }
@@ -256,26 +266,26 @@ public class ActivityShow extends ActionBarActivity {
         mCurrentCompletedTasks = 0;
         mCurrentTaskNumber = mProjectManager.getTaskNumber(mProjectID);
         ArrayList<ShowList> taskList = new ArrayList<ShowList>();
-        for(int i = 0; i < mCurrentTaskNumber; i++) {
-            String [] contents = mProjectManager.getTask(mProjectID, i);
+        for (int i = 0; i < mCurrentTaskNumber; i++) {
+            String[] contents = mProjectManager.getTask(mProjectID, i);
             taskList.add(new ShowList(
                     contents[ProjectManager.POS_NAME],
                     contents[ProjectManager.POS_MEMBERS],
                     contents[ProjectManager.POS_DESCRIPTION],
-                    contents[ProjectManager.POS_START_DATE]+contents[ProjectManager.POS_START_TIME],
-                    contents[ProjectManager.POS_DUE_DATE]+contents[ProjectManager.POS_DUE_TIME],
+                    contents[ProjectManager.POS_START_DATE] + contents[ProjectManager.POS_START_TIME],
+                    contents[ProjectManager.POS_DUE_DATE] + contents[ProjectManager.POS_DUE_TIME],
                     contents[ProjectManager.POS_COMPLETION].length() != 0,
                     mCurrentCompletion
             ));
-            if(contents[ProjectManager.POS_COMPLETION].length() != 0)
+            if (contents[ProjectManager.POS_COMPLETION].length() != 0)
                 mCurrentCompletedTasks++;
         }
         mList.setAdapter(new AdapterShow(taskList, this));
 
-        TextView view_TaskHint = (TextView)findViewById(R.id.show_text_taskHint);
-        if(mCurrentTaskNumber == 0)
+        TextView view_TaskHint = (TextView) findViewById(R.id.show_text_taskHint);
+        if (mCurrentTaskNumber == 0)
             view_TaskHint.setText("No Tasks");
-        else if(mCurrentTaskNumber == 1)
+        else if (mCurrentTaskNumber == 1)
             view_TaskHint.setText("Task");
         else
             view_TaskHint.setText("Tasks");
@@ -295,7 +305,7 @@ public class ActivityShow extends ActionBarActivity {
     @Override
     protected void onStop() {
         Log.d(TAG, "On stop.");
-        if(!mInSwitching)
+        if (!mInSwitching)
             stopService(new Intent(this, ServiceMusic.class));
         super.onStop();
     }
@@ -319,7 +329,7 @@ public class ActivityShow extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if(mProjectContents[ProjectManager.POS_COMPLETION].length() != 0)
+        if (mProjectContents[ProjectManager.POS_COMPLETION].length() != 0)
             getMenuInflater().inflate(R.menu.menu_show_completed, menu);
         else
             getMenuInflater().inflate(R.menu.menu_show, menu);
@@ -332,10 +342,9 @@ public class ActivityShow extends ActionBarActivity {
 
         if (id == R.id.action_edit_project) {
             Log.d(TAG, "User clicked edit menu.");
-            if(mCurrentCompletion) {
+            if (mCurrentCompletion) {
                 Toast.makeText(this, "Cannot Edit A Completed Project!", Toast.LENGTH_SHORT).show();
-            }
-            else {
+            } else {
                 mInSwitching = true;
                 Intent intent = new Intent(getApplicationContext(), ActivityEdit.class);
                 intent.putExtra(ProjectManager.PROJECT_ID, mProjectID);
@@ -345,19 +354,19 @@ public class ActivityShow extends ActionBarActivity {
         }
         if (id == R.id.action_share_project) {
             String fileName = mProjectManager.saveOneProject(mProjectID);
-            if(fileName.length() != 0) {
+            if (fileName.length() != 0) {
                 Log.d(TAG, fileName + " has been exported and is being sent!");
                 Toast.makeText(this, fileName + " has been exported", Toast.LENGTH_SHORT).show();
 
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("message/rfc822");
-                intent.putExtra(Intent.EXTRA_EMAIL, new String[] {"ljin027@uottawa.ca"});
+                intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"ljin027@uottawa.ca"});
                 intent.putExtra(Intent.EXTRA_SUBJECT, "Sharing an iProject");
                 intent.putExtra(Intent.EXTRA_TEXT,
                         "This is my project \""
-                        + mProjectContents[ProjectManager.POS_NAME]
-                        + "\":\n"
-                        + mProjectContents[ProjectManager.POS_DESCRIPTION]);
+                                + mProjectContents[ProjectManager.POS_NAME]
+                                + "\":\n"
+                                + mProjectContents[ProjectManager.POS_DESCRIPTION]);
 
                 File file = new File(fileName);
                 if (!file.exists() || !file.canRead()) {
@@ -381,8 +390,8 @@ public class ActivityShow extends ActionBarActivity {
     }
 
     public void onCheckTaskComplete(View view) {
-        CheckBox checkBox = (CheckBox)view;
-        int position = (Integer)checkBox.getTag();
+        CheckBox checkBox = (CheckBox) view;
+        int position = (Integer) checkBox.getTag();
         Log.d(TAG, "User clicked check button at row " + position + ".");
         if (checkBox.isChecked()) {
             mCurrentCompletedTasks++;
@@ -397,22 +406,22 @@ public class ActivityShow extends ActionBarActivity {
 
     private int getProjectProgress() {
         long currentTime = System.currentTimeMillis();
-        Date startDate = Project.getDate(mProjectContents[ProjectManager.POS_START_DATE]+mProjectContents[ProjectManager.POS_START_TIME]);
-        Date dueDate = Project.getDate(mProjectContents[ProjectManager.POS_DUE_DATE]+mProjectContents[ProjectManager.POS_DUE_TIME]);
+        Date startDate = Project.getDate(mProjectContents[ProjectManager.POS_START_DATE] + mProjectContents[ProjectManager.POS_START_TIME]);
+        Date dueDate = Project.getDate(mProjectContents[ProjectManager.POS_DUE_DATE] + mProjectContents[ProjectManager.POS_DUE_TIME]);
         long startTime = startDate.getTime();
         long dueTime = dueDate.getTime();
-        if(dueTime > currentTime && startTime < currentTime)
-            return (int)(100 * (currentTime - startTime) / (dueTime - startTime));
-        else if(currentTime > dueTime)
+        if (dueTime > currentTime && startTime < currentTime)
+            return (int) (100 * (currentTime - startTime) / (dueTime - startTime));
+        else if (currentTime > dueTime)
             return 100;
         else
             return 0;
     }
 
     private int getTaskProgress() {
-        if(mCurrentTaskNumber == 0)
+        if (mCurrentTaskNumber == 0)
             return 100;
         else
-            return 100*mCurrentCompletedTasks/mCurrentTaskNumber;
+            return 100 * mCurrentCompletedTasks / mCurrentTaskNumber;
     }
 }

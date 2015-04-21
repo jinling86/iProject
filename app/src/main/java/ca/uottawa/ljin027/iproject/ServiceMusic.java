@@ -6,12 +6,17 @@ import android.media.MediaPlayer;
 import android.os.IBinder;
 
 /**
- * Created by ljin027 on 17/04/2015.
+ * This class is implemented for CSI5175 Assignment 3.
+ * This class implements a music playing service. The service should be created when the app starts,
+ * and destroyed when the app is switched out.
+ *
+ * @author Ling Jin
+ * @version 1.0
+ * @since 17/04/2015
  */
-
-public class ServiceMusic extends Service
-{
+public class ServiceMusic extends Service {
     MediaPlayer mPlayer;
+
     public IBinder onBind(Intent arg) {
         return null;
     }
@@ -25,7 +30,7 @@ public class ServiceMusic extends Service
     }
 
     @Override
-    public int  onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(Intent intent, int flags, int startId) {
         return super.onStartCommand(intent, flags, startId);
     }
 
