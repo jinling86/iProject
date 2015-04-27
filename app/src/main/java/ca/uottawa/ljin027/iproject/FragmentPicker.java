@@ -14,7 +14,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * This class is implemented for CSI5175 Bonus Assignment.
  * This class implements a time and date picker. The time and date is constrained as follows:
  *
  * Project start time should be earlier than the start time of any sub-tasks;

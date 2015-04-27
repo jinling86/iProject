@@ -12,7 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
- * This class is implemented for CSI5175 Bonus Assignment.
  * This class implements a Dialog fragment for prompting the report to users. The fond, style, size
  * of the text are customized for a better visual effect.
  *

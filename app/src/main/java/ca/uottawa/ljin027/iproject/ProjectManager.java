@@ -19,7 +19,6 @@ import java.util.TreeMap;
 
 
 /**
- * This class is implemented for CSI5175 Bonus Assignment.
  * This class manages projects and their tasks. It manages project file read and write, generates
  * project reports, and provide interfaces for the Activities in the system.
  *

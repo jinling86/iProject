@@ -12,7 +12,6 @@ import android.widget.TextView;
 import java.util.List;
 
 /**
- * This class is implemented for CSI5175 Bonus Assignment.
  * This class defines the data structure used in the following array adapter.
  *
  * @author Ling Jin
@@ -76,7 +75,6 @@ class ShowList {
 }
 
 /**
- * This class is implemented for CSI5175 Bonus Assignment.
  * This class implements an adapter for populating the fields of the list view. The adapter supports
  * the check box in the list view.
  *

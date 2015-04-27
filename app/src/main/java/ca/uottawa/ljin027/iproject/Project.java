@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * This class is implemented for CSI5175 Bonus Assignment.
  * This class defines the project fields and their corresponding formats. It also provide a
  * comparator for the generic sort method. The compare is perform by comparing due date.
  *

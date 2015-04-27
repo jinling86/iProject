@@ -21,7 +21,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * This class is implemented for CSI5175 Bonus Assignment.
  * This class shows project list to users. It also provides adding, editing, sorting and reporting
  * functions. It can start project edit Activity and project show Activity.
  * It starts the background music when startup.

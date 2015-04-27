@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * This class is implemented for CSI5175 Bonus Assignment.
  * This class supports the editing of a project. This includes modifying contents of the project,
  * adding, deleting, modifying sub-tasks of the project, ensuring the date and time is right in
  * order to be used in the following comparison.

@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * This class is implemented for CSI5175 Bonus Assignment.
  * This class displays the detail information of a project in the UI. It also computes the remaining
  * time and tasks of the project.
  * The project and sub-tasks can be marked as done in this activity. After marking as done, the
