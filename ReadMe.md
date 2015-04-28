@@ -1,4 +1,10 @@
-This app is implemented for CSI 5175 Bonus Assignment. All the requirements have been implemented. The app is tested on a Nexus 5 (Android 5.1.1) and emulators (Android 5.0.1 and 5.1.1).
+# A project management application
+
+Ling Jin
+April 27, 2015
+University of Ottawa
+
+# Introduction
 
 Requirement 1: mainly implemented in class ActivityEdit, supported by ProjectManager, FragmentPicker;
 Requirement 2: mainly implemented in class ActivityEdit, supported by ProjectManager, FragmentPicker;
@@ -12,5 +18,3 @@ Requirement 9: mainly implemented in class ActivityShow, supported by ProjectMan
 Requirement 10: mainly implemented in class ServiceMusic, supported by all activities;
 Requirement 11: mainly implemented in class ActivityShow.
 The data structure of the project is defined in class Project.
-
-Ling
