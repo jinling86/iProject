@@ -1,6 +1,6 @@
 # iProject
 
-A project management APP Implemented for CSI 5171 Assignment 3
+A project management APP implemented for CSI 5171 Assignment 3
 
 Ling Jin @ uOttawa, April 27, 2015
 
@@ -15,7 +15,7 @@ There are also additional functionalities available. For example, exporting or i
 # Screenshots
 ![alt text](https://github.com/jinling86/iProject/blob/master/app/src/main/res/drawable/iProject.png)
 
-# Todos
+# Todo's
 
 The visible position of the list view in the editing activity always goes to the top of the view in the outer layer...
 
@@ -23,6 +23,6 @@ The current work mainly focus on the UI of the APP. Some user(team member) manag
 
 # License
 
-Feel free to use iProject as well as its code. Hope I will not burn your cell phone.
+Feel free to use iProject as well as its code. Hope it will not burn your cell phone.
 
 Have fun!
