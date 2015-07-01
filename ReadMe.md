@@ -1,10 +1,10 @@
-# A project management application
+# iProject
 
-- Ling Jin
-- April 27, 2015
-- University of Ottawa
+> A project management APP
+> Implemented for CSI 5171 Assignment 3
+> Ling Jin @ uOttawa, April 27, 2015
 
-# Introduction
+# Des
 
 - Requirement 1: mainly implemented in class ActivityEdit, supported by ProjectManager, FragmentPicker;
 - Requirement 2: mainly implemented in class ActivityEdit, supported by ProjectManager, FragmentPicker;
