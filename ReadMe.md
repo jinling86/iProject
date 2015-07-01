@@ -1,7 +1,9 @@
 # iProject
 
 > A project management APP
+>
 > Implemented for CSI 5171 Assignment 3
+>
 > Ling Jin @ uOttawa, April 27, 2015
 
 # Des
