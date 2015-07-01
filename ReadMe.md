@@ -1,22 +1,17 @@
 # iProject
 
-> A project management APP
->
-> Implemented for CSI 5171 Assignment 3
->
-> Ling Jin @ uOttawa, April 27, 2015
+A project management APP Implemented for CSI 5171 Assignment 3
+Ling Jin @ uOttawa, April 27, 2015
 
-# Des
+# Features
 
-- Requirement 1: mainly implemented in class ActivityEdit, supported by ProjectManager, FragmentPicker;
-- Requirement 2: mainly implemented in class ActivityEdit, supported by ProjectManager, FragmentPicker;
-- Requirement 3: mainly implemented in class ActivityEdit;
-- Requirement 4: mainly implemented in class ActivityList, ActivityShow, supported by AdapterList, AdapterShow;
-- Requirement 5: mainly implemented in class ActivityList, supported by ProjectManager and DialogReport;
-- Requirement 6: mainly implemented in class ActivityList, supported by ProjectManager and DialogReport;
-- Requirement 7: mainly implemented in class ActivityList, supported by DialogReport;
-- Requirement 8: mainly implemented in class ActivityList, supported by ProjectManager;
-- Requirement 9: mainly implemented in class ActivityShow, supported by ProjectManager;
-- Requirement 10: mainly implemented in class ServiceMusic, supported by all activities;
-- Requirement 11: mainly implemented in class ActivityShow.
-- The data structure of the project is defined in class Project.
+The APP manages course projects. A project may consist of information such as course name, description, team members, start time and due date. A project can be further devided into tasks which also consist of information such as task name, start time and due date.
+The APP lists the projects which are due in 2 days and plays background music when it starts. All the projects will be shown as default. The detail project information and task list will be shown when a project is selected. A further button click enables the edit UI.
+There are also additional functionalities available. For example, exporting or importing a project, changing the priority of a project, sorting the project based on different factors.
+
+# Screenshots
+![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
+
+# Todos
+
+# License
